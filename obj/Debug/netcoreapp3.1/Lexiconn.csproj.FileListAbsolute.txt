@@ -156,7 +156,6 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\ru\
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Create.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Delete.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Details.cshtml.g.cs
@@ -167,3 +166,4 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Raz
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Details.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Edit.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Index.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache

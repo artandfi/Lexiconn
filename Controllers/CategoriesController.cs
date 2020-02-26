@@ -55,6 +55,13 @@ namespace Lexiconn.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
+            bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name));
+
+            if (duplicate)
+            {
+                ModelState.AddModelError("Name", "Введена категорія вже додана");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(category);

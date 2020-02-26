@@ -55,6 +55,13 @@ namespace Lexiconn.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Language language)
         {
+            bool duplicate = await _context.Languages.AnyAsync(l => l.Name.Equals(language.Name));
+
+            if (duplicate)
+            {
+                ModelState.AddModelError("Name", "Введена мова вже додана");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(language);
