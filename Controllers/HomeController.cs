@@ -19,6 +19,7 @@ namespace Lexiconn.Controllers
             _logger = logger;
         }
 
+        // REFACTOR: split into several methods, this class surely lacks ones
         public async Task<IActionResult> Index()
         {
             var db = new DBDictionaryContext();
@@ -39,11 +40,17 @@ namespace Lexiconn.Controllers
                 model.Category = catWord.Category.Name;
                 model.CategoryId = catWord.CategoryId;
 
-                // TODO: transform list into comma-separated string (consider multiple translations)
                 var translations = await db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                model.Translation = translations[0].ThisTranslation;
 
+                string commaTranslations = "";
 
+                // Display as a comma-separated list
+                for (int i = 0; i < translations.Count - 1; i++)
+                {
+                    commaTranslations += translations[i].ThisTranslation + ", ";
+                }
+                commaTranslations += translations[translations.Count].ThisTranslation;
+                model.Translation = commaTranslations;
 
                 modelList.Add(model);
             }

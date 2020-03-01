@@ -45,18 +45,22 @@ namespace Lexiconn.Controllers
                 ModelState.AddModelError("Translation", "Такий запис вже існує");
             }
 
+            bool error = false;
+
             if (ModelState.IsValid)
             {
-                var word = new Word();
-                ProcessWord(word, db, model, out int wordId);
+                ProcessWord(db, model, out int wordId);
+                ProcessCatWord(db, model, wordId, out int catWordId);
+                ProcessTranslation(db, model, catWordId, out error);
 
-                var catWord = new CategorizedWord();
-                ProcessCatWord(catWord, db, model, wordId, out int catWordId);
+            }
 
-                // TODO: resolve multiple translations (add categorized word's PK to each one)
-                var translation = new Translation();
-                ProcessTranslation(translation, db, model, catWordId);
-
+            if (error)
+            {
+                ModelState.AddModelError("Translation", "Некоректний формат введеняя ком");
+            }
+            else
+            {
                 return RedirectToAction("Create");
             }
 
@@ -137,8 +141,9 @@ namespace Lexiconn.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private void ProcessWord(Word word, DBDictionaryContext db, WordData model, out int wordId)
+        private void ProcessWord(DBDictionaryContext db, WordData model, out int wordId)
         {
+            var word = new Word();
             word.LanguageId = model.LanguageId;
             word.ThisWord = model.Word;
 
@@ -158,8 +163,9 @@ namespace Lexiconn.Controllers
             }
         }
 
-        private void ProcessCatWord(CategorizedWord catWord, DBDictionaryContext db, WordData model, int wordId, out int catWordId)
+        private void ProcessCatWord(DBDictionaryContext db, WordData model, int wordId, out int catWordId)
         {
+            var catWord = new CategorizedWord();
             catWord.WordId = wordId;
             catWord.CategoryId = model.CategoryId;
 
@@ -168,15 +174,92 @@ namespace Lexiconn.Controllers
             catWordId = catWord.Id;
         }
 
-        private void ProcessTranslation(Translation translation, DBDictionaryContext db, WordData model, int catWordId)
+        private void ProcessTranslation(DBDictionaryContext db, WordData model, int catWordId, out bool error)
         {
-            translation.CategorizedWordId = catWordId;
-            translation.ThisTranslation = model.Translation;
+            error = false;
+            List<Translation> translations = new List<Translation>();
 
-            db.Translations.Add(translation);
+            if (!SplitTranslations(model.Translation, ref translations))
+            {
+                error = true;
+                return;
+            }
+            
+            foreach (var translation in translations)
+            {
+                translation.CategorizedWordId = catWordId;
+            }
+
+            db.Translations.AddRange(translations);
             db.SaveChanges();
         }
 
+        private bool SplitTranslations(string raw, ref List<Translation> translations)
+        {
+            string curTranslation = "";
+            char cur = raw[0];
+
+            if (!ResolveFirstCharacter(cur, ref curTranslation))
+            {
+                return false;
+            }
+
+            for (int i = 1; i < raw.Length; i++)
+            {
+                cur = raw[i];
+                char prev = raw[i - 1];
+
+                if (!ResolveCharacters(prev, cur, ref curTranslation, ref translations))
+                {
+                    return false;
+                }
+            }
+
+            if (curTranslation.Last() == ' ')
+                curTranslation = curTranslation.Substring(0, curTranslation.Length - 1);
+
+            translations.Add(new Translation() { ThisTranslation = curTranslation });
+            return true;
+        }
+
+        private bool ResolveFirstCharacter(char cur, ref string curTranslation)
+        {
+            if (cur == ',')
+            {
+                return false;
+            }
+            if (cur != ' ')
+            {
+                curTranslation += cur;
+            }
+
+            return true;
+        }
+
+        private bool ResolveCharacters(char prev, char cur, ref string curTranslation, ref List<Translation> translations)
+        {
+            if (cur == ',' || cur == ' ')
+            {
+                if (prev == ',')
+                {
+                    return false;
+                }
+                if (prev != ' ')
+                    curTranslation += cur;
+            }
+            else
+            {
+                if (cur == ',')
+                {
+                    translations.Add(new Translation() { ThisTranslation = curTranslation });
+                    curTranslation = "";
+                }
+                else
+                    curTranslation += cur;
+            }
+
+            return true;
+        }
 
         // In Words table, updates the word and its language.
         private void UpdateWord(string newWord, int wordId, int langId, DBDictionaryContext db)
