@@ -1,8 +1,75 @@
-﻿@{
+﻿@model IEnumerable<Lexiconn.Models.WordData>
+
+@{
     ViewData["Title"] = "Головна";
 }
 
 <div class="text-center">
     <h1 class="display-4">Lexiconn</h1>
     <p>Словник. Ваш.</p>
+    @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
+    {
+        <input type="submit" value="Додати слово" class="btn btn-primary" />
+    }
 </div>
+
+<br />
+
+<table class="table" align="center">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Word)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Language)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Translation)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Word)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Language)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Translation)
+                </td>
+                <td>
+                    <form asp-controller="WordData"
+                          asp-action="Delete"
+                          asp-route-word="@item.Word"
+                          asp-route-langId="@item.LanguageId"
+                          asp-route-catId="@item.CategoryId"
+                          asp-route-translation="@item.Translation">
+                        <a asp-controller="WordData"
+                           asp-action="Edit"
+                           asp-route-word="@item.Word"
+                           asp-route-langId="@item.LanguageId"
+                           asp-route-catId="@item.CategoryId"
+                           asp-route-translation="@item.Translation">Редагувати</a> |
+                        <button type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Ви впевнені, що хочете видалити цей запис?')">
+                            Видалити
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<hr />

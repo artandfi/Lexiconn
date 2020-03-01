@@ -9,22 +9,23 @@ using Lexiconn;
 
 namespace Lexiconn.Controllers
 {
-    public class CategoriesController : Controller
+    public class WordsController : Controller
     {
         private readonly DBDictionaryContext _context;
 
-        public CategoriesController(DBDictionaryContext context)
+        public WordsController(DBDictionaryContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Words
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var dBDictionaryContext = _context.Words.Include(w => w.Language);
+            return View(await dBDictionaryContext.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: Words/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,46 +33,42 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var word = await _context.Words
+                .Include(w => w.Language)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (word == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(word);
         }
 
-        // GET: Categories/Create
+        // GET: Words/Create
         public IActionResult Create()
         {
+            ViewData["LanguageId"] = new SelectList(_context.Languages, "Id", "Name");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Words/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,ThisWord,LanguageId")] Word word)
         {
-            bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name));
-
-            if (duplicate)
-            {
-                ModelState.AddModelError("Name", "Введена категорія вже додана");
-            }
-
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(word);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["LanguageId"] = new SelectList(_context.Languages, "Id", "Name", word.LanguageId);
+            return View(word);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Words/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,22 +76,23 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var word = await _context.Words.FindAsync(id);
+            if (word == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["LanguageId"] = new SelectList(_context.Languages, "Id", "Name", word.LanguageId);
+            return View(word);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Words/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ThisWord,LanguageId")] Word word)
         {
-            if (id != category.Id)
+            if (id != word.Id)
             {
                 return NotFound();
             }
@@ -103,12 +101,12 @@ namespace Lexiconn.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(word);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!WordExists(word.Id))
                     {
                         return NotFound();
                     }
@@ -119,10 +117,11 @@ namespace Lexiconn.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["LanguageId"] = new SelectList(_context.Languages, "Id", "Name", word.LanguageId);
+            return View(word);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Words/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,45 +129,31 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var word = await _context.Words
+                .Include(w => w.Language)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (word == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(word);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Words/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            var catWords = await _context.CategorizedWords.Where(cw => cw.CategoryId == id).ToListAsync();
-            var words = new List<Word>();
-            var translations = new List<Translation>();
-
-            foreach (var catWord in catWords)
-            {
-                var word = await _context.Words.FirstOrDefaultAsync(w => w.Id == catWord.WordId);
-                words.Add(word);
-                var trList = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                translations.AddRange(trList);
-            }
-
-            _context.Translations.RemoveRange(translations);
-            _context.CategorizedWords.RemoveRange(catWords);
-            _context.Words.RemoveRange(words);
-            _context.Categories.Remove(category);
+            var word = await _context.Words.FindAsync(id);
+            _context.Words.Remove(word);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool WordExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Words.Any(e => e.Id == id);
         }
     }
 }

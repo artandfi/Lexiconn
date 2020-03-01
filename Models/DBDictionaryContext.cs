@@ -79,11 +79,6 @@ namespace Lexiconn
 
                 entity.Property(e => e.CategorizedWordId).HasColumnName("categorizedWordId");
 
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasColumnName("description")
-                    .HasColumnType("ntext");
-
                 entity.Property(e => e.ThisTranslation)
                     .IsRequired()
                     .HasColumnName("thisTranslation")

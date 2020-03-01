@@ -9,22 +9,23 @@ using Lexiconn;
 
 namespace Lexiconn.Controllers
 {
-    public class CategoriesController : Controller
+    public class CategorizedWordsController : Controller
     {
         private readonly DBDictionaryContext _context;
 
-        public CategoriesController(DBDictionaryContext context)
+        public CategorizedWordsController(DBDictionaryContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: CategorizedWords
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var dBDictionaryContext = _context.CategorizedWords.Include(c => c.Category).Include(c => c.Word);
+            return View(await dBDictionaryContext.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: CategorizedWords/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,46 +33,45 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var categorizedWord = await _context.CategorizedWords
+                .Include(c => c.Category)
+                .Include(c => c.Word)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (categorizedWord == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(categorizedWord);
         }
 
-        // GET: Categories/Create
+        // GET: CategorizedWords/Create
         public IActionResult Create()
         {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["WordId"] = new SelectList(_context.Words, "Id", "ThisWord");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: CategorizedWords/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,WordId,CategoryId")] CategorizedWord categorizedWord)
         {
-            bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name));
-
-            if (duplicate)
-            {
-                ModelState.AddModelError("Name", "Введена категорія вже додана");
-            }
-
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(categorizedWord);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", categorizedWord.CategoryId);
+            ViewData["WordId"] = new SelectList(_context.Words, "Id", "ThisWord", categorizedWord.WordId);
+            return View(categorizedWord);
         }
 
-        // GET: Categories/Edit/5
+        // GET: CategorizedWords/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,22 +79,24 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var categorizedWord = await _context.CategorizedWords.FindAsync(id);
+            if (categorizedWord == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", categorizedWord.CategoryId);
+            ViewData["WordId"] = new SelectList(_context.Words, "Id", "ThisWord", categorizedWord.WordId);
+            return View(categorizedWord);
         }
 
-        // POST: Categories/Edit/5
+        // POST: CategorizedWords/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,WordId,CategoryId")] CategorizedWord categorizedWord)
         {
-            if (id != category.Id)
+            if (id != categorizedWord.Id)
             {
                 return NotFound();
             }
@@ -103,12 +105,12 @@ namespace Lexiconn.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(categorizedWord);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!CategorizedWordExists(categorizedWord.Id))
                     {
                         return NotFound();
                     }
@@ -119,10 +121,12 @@ namespace Lexiconn.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", categorizedWord.CategoryId);
+            ViewData["WordId"] = new SelectList(_context.Words, "Id", "ThisWord", categorizedWord.WordId);
+            return View(categorizedWord);
         }
 
-        // GET: Categories/Delete/5
+        // GET: CategorizedWords/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,45 +134,32 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var categorizedWord = await _context.CategorizedWords
+                .Include(c => c.Category)
+                .Include(c => c.Word)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (categorizedWord == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(categorizedWord);
         }
 
-        // POST: Categories/Delete/5
+        // POST: CategorizedWords/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            var catWords = await _context.CategorizedWords.Where(cw => cw.CategoryId == id).ToListAsync();
-            var words = new List<Word>();
-            var translations = new List<Translation>();
-
-            foreach (var catWord in catWords)
-            {
-                var word = await _context.Words.FirstOrDefaultAsync(w => w.Id == catWord.WordId);
-                words.Add(word);
-                var trList = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                translations.AddRange(trList);
-            }
-
-            _context.Translations.RemoveRange(translations);
-            _context.CategorizedWords.RemoveRange(catWords);
-            _context.Words.RemoveRange(words);
-            _context.Categories.Remove(category);
+            var categorizedWord = await _context.CategorizedWords.FindAsync(id);
+            _context.CategorizedWords.Remove(categorizedWord);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool CategorizedWordExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.CategorizedWords.Any(e => e.Id == id);
         }
     }
 }

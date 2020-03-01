@@ -25,10 +25,21 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                <form asp-action="Delete" asp-route-id="@item.Id">
+                    <a asp-action="Edit" asp-route-id="@item.Id"
+                       >Редагувати</a> |
+                    <button type="submit"
+                            class="btn btn-danger"
+                            onclick="return confirm('Ви впевнені, що хочете видалити цю категорію?')">
+                            Видалити
+                    </button>
+                </form>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<a>
+    @Html.ActionLink("На головну", "Index", "Home")
+</a>
