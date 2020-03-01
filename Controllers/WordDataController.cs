@@ -34,7 +34,6 @@ namespace Lexiconn.Controllers
         {
             var db = new DBDictionaryContext();
 
-            // retrieve catword and check IT
             bool duplicate;
             var w = db.Words.FirstOrDefault(x => x.ThisWord.Equals(model.Word)
             && x.LanguageId == model.LanguageId);
@@ -74,12 +73,13 @@ namespace Lexiconn.Controllers
 
             var wordId = db.Words.First(w => w.ThisWord.Equals(word)).Id;
             ViewData["WordId"] = wordId;
-            ViewData["CatWordId"] = db.CategorizedWords.First(cw => cw.WordId == wordId && cw.CategoryId == catId).Id;
+            var catWordId = db.CategorizedWords.First(cw => cw.WordId == wordId && cw.CategoryId == catId).Id;
+            ViewData["CatWordId"] = catWordId;
             ViewData["LangId"] = langId;
             ViewData["CatId"] = catId;
 
             // TODO: multiple translations (split the translation string by commas, retrieve list of IDs)
-            ViewData["TranslationId"] = db.Translations.First(t => t.ThisTranslation.Equals(translation)).Id;
+            ViewData["TranslationId"] = db.Translations.First(t => t.ThisTranslation.Equals(translation) && t.CategorizedWordId == catWordId).Id;
 
             var langList = new SelectList(db.Languages, "Id", "Name");
             ViewData["LanguageList"] = langList;
@@ -119,7 +119,22 @@ namespace Lexiconn.Controllers
             var model = new WordData();
             var db = new DBDictionaryContext();
 
-            return View(model);
+            var wordEntity = db.Words.First(w => w.ThisWord.Equals(word) && w.LanguageId == langId);
+            var catWordEntity = db.CategorizedWords.First(cw => cw.WordId == wordEntity.Id && cw.CategoryId == catId);
+            // TODO: translations list (simply delete all)
+            var translationEntity = db.Translations.First(t => t.CategorizedWordId == catWordEntity.Id);
+
+            db.Remove(translationEntity);
+            db.Remove(catWordEntity);
+            db.SaveChanges();
+
+            if (!db.CategorizedWords.Any(cw => cw.WordId == wordEntity.Id))
+            {
+                db.Remove(wordEntity);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         private void ProcessWord(Word word, DBDictionaryContext db, WordData model, out int wordId)
@@ -127,10 +142,41 @@ namespace Lexiconn.Controllers
             word.LanguageId = model.LanguageId;
             word.ThisWord = model.Word;
 
-            db.Words.Add(word);
-            db.SaveChanges();
-            wordId = word.Id;
+            // Check if such word already exists in table, if it does, then resolve existing one's ID
+            // (here, words are guaranteedly distinct)
+            var sameWord = db.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word));
+
+            if (sameWord == null)
+            {
+                db.Words.Add(word);
+                db.SaveChanges();
+                wordId = word.Id;
+            }
+            else
+            {
+                wordId = sameWord.Id;
+            }
         }
+
+        private void ProcessCatWord(CategorizedWord catWord, DBDictionaryContext db, WordData model, int wordId, out int catWordId)
+        {
+            catWord.WordId = wordId;
+            catWord.CategoryId = model.CategoryId;
+
+            db.CategorizedWords.Add(catWord);
+            db.SaveChanges();
+            catWordId = catWord.Id;
+        }
+
+        private void ProcessTranslation(Translation translation, DBDictionaryContext db, WordData model, int catWordId)
+        {
+            translation.CategorizedWordId = catWordId;
+            translation.ThisTranslation = model.Translation;
+
+            db.Translations.Add(translation);
+            db.SaveChanges();
+        }
+
 
         // In Words table, updates the word and its language.
         private void UpdateWord(string newWord, int wordId, int langId, DBDictionaryContext db)
@@ -161,25 +207,6 @@ namespace Lexiconn.Controllers
             translationEntity.ThisTranslation = newTranslation;
 
             db.Update(translationEntity);
-            db.SaveChanges();
-        }
-
-        private void ProcessCatWord(CategorizedWord catWord, DBDictionaryContext db, WordData model, int wordId, out int catWordId)
-        {
-            catWord.WordId = wordId;
-            catWord.CategoryId = model.CategoryId;
-
-            db.CategorizedWords.Add(catWord);
-            db.SaveChanges();
-            catWordId = catWord.Id;
-        }
-
-        private void ProcessTranslation(Translation translation, DBDictionaryContext db, WordData model, int catWordId)
-        {
-            translation.CategorizedWordId = catWordId;
-            translation.ThisTranslation = model.Translation;
-
-            db.Translations.Add(translation);
             db.SaveChanges();
         }
 

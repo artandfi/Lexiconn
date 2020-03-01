@@ -42,6 +42,9 @@ namespace Lexiconn.Controllers
                 // TODO: transform list into comma-separated string (consider multiple translations)
                 var translations = await db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
                 model.Translation = translations[0].ThisTranslation;
+
+
+
                 modelList.Add(model);
             }
 
