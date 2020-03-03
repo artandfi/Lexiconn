@@ -10,6 +10,8 @@
     @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
     {
         <input type="submit" value="Додати слово" class="btn btn-primary" />
+        <input type="hidden" name="returnController" value="Home" />
+        <input type="hidden" name="returnAction" value="Index" />
     }
 </div>
 
@@ -54,13 +56,19 @@
                           asp-route-word="@item.Word"
                           asp-route-langId="@item.LanguageId"
                           asp-route-catId="@item.CategoryId"
-                          asp-route-translation="@item.Translation">
+                          asp-route-translation="@item.Translation"
+                          asp-route-translationIds="@item.TranslationIds"
+                          asp-route-returnController="Home"
+                          asp-route-returnAction="Index">
                         <a asp-controller="WordData"
                            asp-action="Edit"
                            asp-route-word="@item.Word"
                            asp-route-langId="@item.LanguageId"
                            asp-route-catId="@item.CategoryId"
-                           asp-route-translation="@item.Translation">Редагувати</a> |
+                           asp-route-translation="@item.Translation"
+                           asp-route-translationIds="@item.TranslationIds"
+                           asp-route-returnController="Home"
+                           asp-route-returnAction="Index">Редагувати</a> |
                         <button type="submit"
                                 class="btn btn-danger"
                                 onclick="return confirm('Ви впевнені, що хочете видалити цей запис?')">

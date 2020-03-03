@@ -36,10 +36,13 @@
 
             <div class="form-group">
                 <input type="submit" value="Додати" class="btn btn-primary" />
+                <input type="hidden" name="langId" value="@ViewData["LangId"]"/>
+                <input type="hidden" name="returnController" value="@ViewData["ReturnController"]" />
+                <input type="hidden" name="returnAction" value="@ViewData["ReturnAction"]" />
             </div>
         </form>
         <a>
-            @Html.ActionLink("На головну", "Index", "Home")
+            @Html.ActionLink((ViewBag.ReturnController as string).Equals("Home") ? "На головну" : "Назад", ViewBag.ReturnAction as string, ViewBag.ReturnController as string, new { langId = ViewBag.LangId })
         </a>
     </div>
 </div>

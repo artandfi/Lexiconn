@@ -32,5 +32,7 @@ namespace Lexiconn.Models
         [Display(Name = "Переклад")]
         [Required(ErrorMessage = _fillMessage)]
         public string Translation { get; set; }
+
+        public string TranslationIds { get; set; }
     }
 }

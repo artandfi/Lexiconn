@@ -1,24 +1,78 @@
-﻿@model Lexiconn.Language
+﻿@model IEnumerable<Lexiconn.Models.WordData>
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = ViewData["Language"];
 }
 
-<h1>Details</h1>
 
-<div>
-    <h4>Language</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<h1>@ViewData["Language"]</h1>
+    
+<p>
+    <a>
+        @Html.ActionLink("Додати слово", "Create", "WordData", new { returnController = "Languages", returnAction = "Details", langId = ViewData["LangId"] })
+    </a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Word)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Translation)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Word)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Translation)
+                </td>
+                <td>
+                    <form asp-controller="WordData"
+                          asp-action="Delete"
+                          asp-route-word="@item.Word"
+                          asp-route-langId="@item.LanguageId"
+                          asp-route-catId="@item.CategoryId"
+                          asp-route-translation="@item.Translation"
+                          asp-route-translationIds="@item.TranslationIds"
+                          asp-route-returnController="Languages"
+                          asp-route-returnAction="Details">
+                        <a asp-controller="WordData"
+                           asp-action="Edit"
+                           asp-route-word="@item.Word"
+                           asp-route-langId="@item.LanguageId"
+                           asp-route-catId="@item.CategoryId"
+                           asp-route-translation="@item.Translation"
+                           asp-route-translationIds="@item.TranslationIds"
+                           asp-route-returnController="Languages"
+                           asp-route-returnAction="Details">Редагувати</a> |
+                        <button type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Ви впевнені, що хочете видалити цей запис?')">
+                            Видалити
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<hr />
+
+<a>
+    @Html.ActionLink("На головну", "Index", "Home")
+</a>

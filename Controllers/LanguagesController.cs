@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Lexiconn;
+using Lexiconn.Models;
 
 namespace Lexiconn.Controllers
 {
@@ -25,21 +26,60 @@ namespace Lexiconn.Controllers
         }
 
         // GET: Languages/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int langId)
         {
-            if (id == null)
+            var modelList = new List<WordData>();
+            var catWords = new List<CategorizedWord>();
+            var words = await _context.Words.Where(w => w.LanguageId == langId).ToListAsync();
+
+            foreach (var word in words)
             {
-                return NotFound();
+                var cw = await _context.CategorizedWords.Where(c => c.WordId == word.Id).ToListAsync();
+                catWords.AddRange(cw);
+            }
+            
+            foreach (var catWord in catWords)
+            {
+                var model = new WordData();
+                model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
+
+                var language = await _context.Languages.FindAsync(langId);
+                model.LanguageId = langId;
+                model.Language = language.Name;
+                ViewData["Language"] = language.Name;
+                ViewData["LangId"] = language.Id;
+
+                var category = await _context.Categories.FindAsync(catWord.CategoryId);
+                model.Category = catWord.Category.Name;
+                model.CategoryId = catWord.CategoryId;
+
+                var translations = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
+                var translationIds = new List<int>();
+
+                foreach (var translation in translations)
+                {
+                    translationIds.Add(translation.Id);
+                }
+
+                model.TranslationIds = string.Join(",", translationIds);
+
+                string commaTranslations = "";
+
+                for (int i = 0; i < translations.Count - 1; i++)
+                {
+                    commaTranslations += translations[i].ThisTranslation + ", ";
+                }
+
+                if (translations.Count != 0)
+                {
+                    commaTranslations += translations[translations.Count - 1].ThisTranslation;
+                }
+                model.Translation = commaTranslations;
+
+                modelList.Add(model);
             }
 
-            var language = await _context.Languages
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (language == null)
-            {
-                return NotFound();
-            }
-
-            return View(language);
+            return View(modelList);
         }
 
         // GET: Languages/Create

@@ -27,6 +27,7 @@
             <td>
                 <form asp-action="Delete" asp-route-id="@item.Id">
                     <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                    <a asp-action="Details" asp-route-langId="@item.Id">Список слів</a> |
                     <button type="submit"
                             class="btn btn-danger"
                             onclick="return confirm('Ви впевнені, що хочете видалити цю мову?')">

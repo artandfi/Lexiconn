@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Web;
 
 namespace Lexiconn.Controllers
 {
     public class WordDataController : Controller
     {
         // GET: WordData/Create
-        public IActionResult Create()
+        public IActionResult Create(string returnController, string returnAction, int langId)
         {
             var db = new DBDictionaryContext();
 
@@ -22,95 +23,129 @@ namespace Lexiconn.Controllers
                 SetDefaults(db);
             }
 
+            ViewData["LangId"] = langId;
             ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
             ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
+            ViewData["ReturnController"] = returnController;
+            ViewData["ReturnAction"] = returnAction;
             return View();
         }
 
         // POST: WordData/Create
+        // REFACTOR
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(WordData model)
+        public IActionResult Create(WordData model, string returnController, string returnAction, int langId)
         {
             var db = new DBDictionaryContext();
 
-            bool duplicate;
-            var w = db.Words.FirstOrDefault(x => x.ThisWord.Equals(model.Word)
-            && x.LanguageId == model.LanguageId);
-            duplicate = w == null ? false : db.CategorizedWords.Any(cw => cw.WordId == w.Id
-            && cw.CategoryId == model.CategoryId);
-
-            if (duplicate)
+            if (IsDuplicate(model.Word, model.LanguageId, model.CategoryId, db))
             {
                 ModelState.AddModelError("Translation", "Такий запис вже існує");
             }
 
-            bool error = false;
+            bool commaError = false;
+
+            int wordId = 0;
+            int catWordId = 0;
 
             if (ModelState.IsValid)
             {
-                ProcessWord(db, model, out int wordId);
-                ProcessCatWord(db, model, wordId, out int catWordId);
-                ProcessTranslation(db, model, catWordId, out error);
-
-            }
-
-            if (error)
-            {
-                ModelState.AddModelError("Translation", "Некоректний формат введеняя ком");
+                ProcessWord(db, model, out wordId);
+                ProcessCatWord(db, model, wordId, out catWordId);
+                ProcessTranslation(db, model, catWordId, out commaError);
             }
             else
             {
-                return RedirectToAction("Create");
+                ViewData["LangId"] = langId;
+                ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
+                ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
+                ViewData["ReturnController"] = returnController;
+                ViewData["ReturnAction"] = returnAction;
+                return View(model);
             }
 
+            if (commaError)
+            {
+                ModelState.AddModelError("Translation", "Некоректний формат введення");
+                var catWord = db.CategorizedWords.Find(catWordId);
+                var word = db.Words.Find(wordId);
+                db.CategorizedWords.Remove(catWord);
+                db.Words.Remove(word);
+                db.SaveChanges();
+            }
+            else
+            {
+                return returnController.Equals("Home") ? RedirectToAction("Create", new { returnController = returnController, returnAction = returnAction })
+                    : RedirectToAction("Create", new { returnController = returnController, returnAction = returnAction, langId = langId });
+            }
+
+            ViewData["LangId"] = langId;
+            ViewData["ReturnController"] = returnController;
+            ViewData["ReturnAction"] = returnAction;
             ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
             ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
             return View(model);
         }
 
         // GET: WordData/Edit
-        public IActionResult Edit(string word, int langId, int catId, string translation)
+        public IActionResult Edit(string word, int langId, int catId, string translation, string translationIds, string returnController, string returnAction)
         {
             var db = new DBDictionaryContext();
             var model = new WordData();
 
-            var wordId = db.Words.First(w => w.ThisWord.Equals(word)).Id;
-            ViewData["WordId"] = wordId;
+            var wordId = db.Words.First(w => w.ThisWord.Equals(word) && w.LanguageId == langId).Id;
             var catWordId = db.CategorizedWords.First(cw => cw.WordId == wordId && cw.CategoryId == catId).Id;
+            var langList = new SelectList(db.Languages, "Id", "Name");
+            var catList = new SelectList(db.Categories, "Id", "Name");
+
+            ViewData["WordId"] = wordId;
             ViewData["CatWordId"] = catWordId;
             ViewData["LangId"] = langId;
             ViewData["CatId"] = catId;
-
-            // TODO: multiple translations (split the translation string by commas, retrieve list of IDs)
-            ViewData["TranslationId"] = db.Translations.First(t => t.ThisTranslation.Equals(translation) && t.CategorizedWordId == catWordId).Id;
-
-            var langList = new SelectList(db.Languages, "Id", "Name");
+            ViewData["TranslationIds"] = translationIds;
             ViewData["LanguageList"] = langList;
-
-            var catList = new SelectList(db.Categories, "Id", "Name");
             ViewData["CategoryList"] = catList;
+            ViewData["OldTranslation"] = translation;
+            ViewData["ReturnController"] = returnController;
+            ViewData["ReturnAction"] = returnAction;
 
             InitModel(model, db, langId, catId, word, translation);
-
             return View(model);
         }
 
         // POST: WordData/EditConfirmed
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditConfirmed(string word, string translation, int langId, int catId, int wordId, int catWordId, int translationId)
+        public IActionResult Edit(WordData data, string word, string translation, int langId, int catId, int wordId, int catWordId, string translationIds, string returnController, string returnAction)
         {
             var db = new DBDictionaryContext();
 
             if (ModelState.IsValid)
             {
-                UpdateWord(word, wordId, langId, db);
+                UpdateWord(word, wordId, ref langId, db);
                 UpdateCatWord(catWordId, catId, db);
-                UpdateTranslations(translationId, translation, db);
+                UpdateTranslations(translationIds, translation, catWordId, db);
 
-                return RedirectToAction("Index", "Home");
+                ViewData["ReturnAction"] = returnAction;
+                ViewData["ReturnController"] = returnController;
+                ViewData["LangId"] = langId;
+
+                return RedirectToAction(returnAction, returnController, new { langId = langId });
             }
+
+            var langList = new SelectList(db.Languages, "Id", "Name");
+            var catList = new SelectList(db.Categories, "Id", "Name");
+
+            ViewData["ReturnAction"] = returnAction;
+            ViewData["ReturnController"] = returnController;
+            ViewData["WordId"] = wordId;
+            ViewData["CatWordId"] = catWordId;
+            ViewData["LangId"] = langId;
+            ViewData["CatId"] = catId;
+            ViewData["TranslationIds"] = translationIds;
+            ViewData["LanguageList"] = langList;
+            ViewData["CategoryList"] = catList;
 
             var model = new WordData();
             InitModel(model, db, langId, catId, word, translation);
@@ -118,17 +153,16 @@ namespace Lexiconn.Controllers
             return View(model);
         }
 
-        public IActionResult Delete(string word, int langId, int catId, string translation)
+        public IActionResult Delete(string word, int langId, int catId, string returnController, string returnAction)
         {
             var model = new WordData();
             var db = new DBDictionaryContext();
 
             var wordEntity = db.Words.First(w => w.ThisWord.Equals(word) && w.LanguageId == langId);
             var catWordEntity = db.CategorizedWords.First(cw => cw.WordId == wordEntity.Id && cw.CategoryId == catId);
-            // TODO: translations list (simply delete all)
-            var translationEntity = db.Translations.First(t => t.CategorizedWordId == catWordEntity.Id);
+            var translationsEntity = db.Translations.Where(t => t.CategorizedWordId == catWordEntity.Id).ToList();
 
-            db.Remove(translationEntity);
+            db.RemoveRange(translationsEntity);
             db.Remove(catWordEntity);
             db.SaveChanges();
 
@@ -138,7 +172,11 @@ namespace Lexiconn.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Home");
+            ViewData["ReturnAction"] = returnAction;
+            ViewData["ReturnController"] = returnController;
+            ViewData["LangId"] = langId;
+
+            return RedirectToAction(returnAction, returnController, new { langId = langId });
         }
 
         private void ProcessWord(DBDictionaryContext db, WordData model, out int wordId)
@@ -224,37 +262,34 @@ namespace Lexiconn.Controllers
 
         private bool ResolveFirstCharacter(char cur, ref string curTranslation)
         {
-            if (cur == ',')
+            if (cur == ',' || cur == ' ')
             {
                 return false;
             }
-            if (cur != ' ')
-            {
-                curTranslation += cur;
-            }
+            
+            curTranslation += cur;
 
             return true;
         }
 
         private bool ResolveCharacters(char prev, char cur, ref string curTranslation, ref List<Translation> translations)
         {
-            if (cur == ',' || cur == ' ')
+            if (cur == ',')
             {
                 if (prev == ',')
                 {
                     return false;
                 }
-                if (prev != ' ')
-                    curTranslation += cur;
-            }
-            else
-            {
+
                 if (cur == ',')
                 {
                     translations.Add(new Translation() { ThisTranslation = curTranslation });
                     curTranslation = "";
                 }
-                else
+            }
+            else
+            {
+                if (cur != ' ' || cur == ' ' && prev != ' ' && prev != ',')
                     curTranslation += cur;
             }
 
@@ -262,11 +297,17 @@ namespace Lexiconn.Controllers
         }
 
         // In Words table, updates the word and its language.
-        private void UpdateWord(string newWord, int wordId, int langId, DBDictionaryContext db)
+        private void UpdateWord(string newWord, int wordId, ref int langId, DBDictionaryContext db)
         {
             var wordEntity = db.Words.First(w => w.Id == wordId);
             wordEntity.ThisWord = newWord;
-            wordEntity.LanguageId = langId;
+            
+            if (wordEntity.LanguageId != langId)
+            {
+                int tmp = wordEntity.LanguageId;
+                wordEntity.LanguageId = langId;
+                langId = tmp;
+            }
 
             db.Update(wordEntity);
             db.SaveChanges();
@@ -282,15 +323,71 @@ namespace Lexiconn.Controllers
             db.SaveChanges();
         }
 
-        // TODO: multiple translations update logic
-        // In Translations table, updates the translation.
-        private void UpdateTranslations(int translationId, string newTranslation, DBDictionaryContext db)
+        private bool UpdateTranslations(string translationIdList, string newTranslation, int catWordId, DBDictionaryContext db)
         {
-            var translationEntity = db.Translations.First(t => t.Id == translationId);
-            translationEntity.ThisTranslation = newTranslation;
+            var oldTranslationIds = translationIdList.Split(',').Select(Int32.Parse).ToList();
+            var oldTranslations = new List<Translation>();
+            var newTranslations = new List<Translation>();
 
-            db.Update(translationEntity);
+            if (!SplitTranslations(newTranslation, ref newTranslations))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < oldTranslationIds.Count; i++)
+            {
+                oldTranslations.Add(db.Translations.Find(oldTranslationIds[i]));
+                if (i < newTranslations.Count)
+                    oldTranslations[i].ThisTranslation = newTranslations[i].ThisTranslation;
+            }
+
+            for (int i = 0; i < newTranslations.Count; i++)
+            {
+                newTranslations[i].CategorizedWordId = catWordId;
+            }
+
+            ResolveTranslationUpdate(oldTranslations, newTranslations, oldTranslationIds);
+            return true;
+        }
+
+        private void ResolveTranslationUpdate(List<Translation> oldTs, List<Translation> newTs, List<int> oldIds)
+        {
+            var db = new DBDictionaryContext();
+            // Update old, add new
+            if (oldTs.Count < newTs.Count)
+            {
+                for (int i = 0; i < oldTs.Count; i++)
+                {
+                    db.Update(oldTs[i]);
+                }
+                for (int i = oldTs.Count; i < newTs.Count; i++)
+                {
+                    db.Translations.Add(newTs[i]);
+                }
+            }
+            // Delete extra if present, update old
+            else
+            {
+                for (int i = newTs.Count; i < oldTs.Count; i++)
+                {
+                    db.Translations.Remove(oldTs[i]);
+                }
+
+                for (int i = 0; i < newTs.Count; i++)
+                {
+                    db.Update(oldTs[i]);
+                }
+            }
             db.SaveChanges();
+        }
+
+        private bool IsDuplicate(string word, int langId, int catId, DBDictionaryContext db)
+        {
+            var w = db.Words.FirstOrDefault(x => x.ThisWord.Equals(word)
+            && x.LanguageId == langId);
+
+            return w == null ? false : db.CategorizedWords.Any(cw => cw.WordId == w.Id
+            && cw.CategoryId == catId);
         }
 
         private void SetDefaults(DBDictionaryContext db)

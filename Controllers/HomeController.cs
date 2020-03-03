@@ -41,15 +41,26 @@ namespace Lexiconn.Controllers
                 model.CategoryId = catWord.CategoryId;
 
                 var translations = await db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
+                var translationIds = new List<int>();
+
+                foreach (var translation in translations)
+                {
+                    translationIds.Add(translation.Id);
+                }
+
+                model.TranslationIds = string.Join(",", translationIds);
 
                 string commaTranslations = "";
 
-                // Display as a comma-separated list
                 for (int i = 0; i < translations.Count - 1; i++)
                 {
                     commaTranslations += translations[i].ThisTranslation + ", ";
                 }
-                commaTranslations += translations[translations.Count].ThisTranslation;
+
+                if (translations.Count != 0)
+                {
+                    commaTranslations += translations[translations.Count - 1].ThisTranslation;
+                }
                 model.Translation = commaTranslations;
 
                 modelList.Add(model);
