@@ -29,44 +29,35 @@ namespace Lexiconn.Controllers
             foreach (var catWord in catWords)
             {
                 var model = new WordData();
-                var word = await db.Words.FirstOrDefaultAsync(w => w.Id == catWord.WordId);
-                model.Word = word.ThisWord;
-                
-                var language = await db.Languages.FirstOrDefaultAsync(l => l.Id == word.LanguageId);
-                model.Language = language.Name;
-                model.LanguageId = word.LanguageId;
-
-                var category = await db.Categories.FirstOrDefaultAsync(c => c.Id == catWord.CategoryId);
-                model.Category = catWord.Category.Name;
-                model.CategoryId = catWord.CategoryId;
-
-                var translations = await db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                var translationIds = new List<int>();
-
-                foreach (var translation in translations)
-                {
-                    translationIds.Add(translation.Id);
-                }
-
-                model.TranslationIds = string.Join(",", translationIds);
-
-                string commaTranslations = "";
-
-                for (int i = 0; i < translations.Count - 1; i++)
-                {
-                    commaTranslations += translations[i].ThisTranslation + ", ";
-                }
-
-                if (translations.Count != 0)
-                {
-                    commaTranslations += translations[translations.Count - 1].ThisTranslation;
-                }
-                model.Translation = commaTranslations;
-
+                FillModel(model, catWord, db);
                 modelList.Add(model);
             }
 
             return View(modelList);
+        }
+
+        private void FillModel(WordData model, CategorizedWord catWord, DBDictionaryContext db)
+        {
+            var word = db.Words.FirstOrDefault(w => w.Id == catWord.WordId);
+            model.Word = word.ThisWord;
+
+            var language = db.Languages.FirstOrDefault(l => l.Id == word.LanguageId);
+            model.Language = language.Name;
+            model.LanguageId = word.LanguageId;
+
+            var category = db.Categories.FirstOrDefault(c => c.Id == catWord.CategoryId);
+            model.Category = catWord.Category.Name;
+            model.CategoryId = catWord.CategoryId;
+
+            var translations = db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
+            var translationIds = new List<int>();
+
+            foreach (var translation in translations)
+            {
+                translationIds.Add(translation.Id);
+            }
+            model.TranslationIds = string.Join(",", translationIds);
+            model.SetCommaTranslations(translations);
         }
 
         public IActionResult Privacy()

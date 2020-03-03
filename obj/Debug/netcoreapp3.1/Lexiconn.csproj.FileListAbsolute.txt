@@ -166,11 +166,6 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Raz
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Details.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Edit.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Index.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\CategorizedWords\Create.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\CategorizedWords\Delete.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\CategorizedWords\Details.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\CategorizedWords\Edit.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\CategorizedWords\Index.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Words\Create.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Words\Delete.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Words\Details.cshtml.g.cs

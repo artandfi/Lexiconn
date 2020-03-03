@@ -34,5 +34,21 @@ namespace Lexiconn.Models
         public string Translation { get; set; }
 
         public string TranslationIds { get; set; }
+
+        public void SetCommaTranslations(List<Translation> translations)
+        {
+            string commaTranslations = "";
+
+            for (int i = 0; i < translations.Count - 1; i++)
+            {
+                commaTranslations += translations[i].ThisTranslation + ", ";
+            }
+
+            if (translations.Count != 0)
+            {
+                commaTranslations += translations[translations.Count - 1].ThisTranslation;
+            }
+            this.Translation = commaTranslations;
+        }
     }
 }

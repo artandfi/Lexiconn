@@ -31,6 +31,7 @@ namespace Lexiconn.Controllers
             var modelList = new List<WordData>();
             var catWords = new List<CategorizedWord>();
             var words = await _context.Words.Where(w => w.LanguageId == langId).ToListAsync();
+            var language = _context.Languages.Find(langId);
 
             foreach (var word in words)
             {
@@ -41,45 +42,36 @@ namespace Lexiconn.Controllers
             foreach (var catWord in catWords)
             {
                 var model = new WordData();
-                model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
-
-                var language = await _context.Languages.FindAsync(langId);
-                model.LanguageId = langId;
-                model.Language = language.Name;
-                ViewData["Language"] = language.Name;
-                ViewData["LangId"] = language.Id;
-
-                var category = await _context.Categories.FindAsync(catWord.CategoryId);
-                model.Category = catWord.Category.Name;
-                model.CategoryId = catWord.CategoryId;
-
-                var translations = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                var translationIds = new List<int>();
-
-                foreach (var translation in translations)
-                {
-                    translationIds.Add(translation.Id);
-                }
-
-                model.TranslationIds = string.Join(",", translationIds);
-
-                string commaTranslations = "";
-
-                for (int i = 0; i < translations.Count - 1; i++)
-                {
-                    commaTranslations += translations[i].ThisTranslation + ", ";
-                }
-
-                if (translations.Count != 0)
-                {
-                    commaTranslations += translations[translations.Count - 1].ThisTranslation;
-                }
-                model.Translation = commaTranslations;
-
+                FillModel(model, language, words, catWord);
                 modelList.Add(model);
             }
 
+            ViewData["Language"] = language.Name;
+            ViewData["LangId"] = langId;
             return View(modelList);
+        }
+
+        private void FillModel(WordData model, Language language, List<Word> words, CategorizedWord catWord)
+        {
+            model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
+
+            model.LanguageId = language.Id;
+            model.Language = language.Name;
+
+            var category = _context.Categories.Find(catWord.CategoryId);
+            model.Category = catWord.Category.Name;
+            model.CategoryId = catWord.CategoryId;
+
+            var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
+            var translationIds = new List<int>();
+
+            foreach (var translation in translations)
+            {
+                translationIds.Add(translation.Id);
+            }
+
+            model.TranslationIds = string.Join(",", translationIds);
+            model.SetCommaTranslations(translations);
         }
 
         // GET: Languages/Create
