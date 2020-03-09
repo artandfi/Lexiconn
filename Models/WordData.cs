@@ -13,6 +13,7 @@ namespace Lexiconn.Models
 
         [Display(Name = "Слово")]
         [Required(ErrorMessage = _fillMessage)]
+        [StringLength(50, ErrorMessage = "Довжина має не перевищувати 50 символів")]
         public string Word { get; set; }
 
         [Display(Name = "Мова")]
@@ -31,6 +32,7 @@ namespace Lexiconn.Models
 
         [Display(Name = "Переклад")]
         [Required(ErrorMessage = _fillMessage)]
+        [StringLength(50, ErrorMessage = "Довжина має не перевищувати 50 символів")]
         public string Translation { get; set; }
 
         public string TranslationIds { get; set; }

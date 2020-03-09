@@ -23,16 +23,14 @@ namespace Lexiconn.Controllers
                 SetDefaults(db);
             }
 
-            ViewData["LangId"] = langId;
-            ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
-            ViewData["ReturnController"] = returnController;
-            ViewData["ReturnAction"] = returnAction;
-            return View();
+            FillViewData(langId, returnController, returnAction, db);
+
+            WordData model = new WordData();
+            model.LanguageId = langId;
+            return View(model);
         }
 
         // POST: WordData/Create
-        // REFACTOR
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(WordData model, string returnController, string returnAction, int langId)
@@ -44,47 +42,22 @@ namespace Lexiconn.Controllers
                 ModelState.AddModelError("Translation", "Такий запис вже існує");
             }
 
-            bool commaError = false;
+            bool commaError;
+            int wordId;
+            int catWordId;
 
-            int wordId = 0;
-            int catWordId = 0;
-
-            if (ModelState.IsValid)
+            if (!ValidateModel(model, langId, out wordId, out catWordId, out commaError, returnController, returnAction, db))
             {
-                ProcessWord(db, model, out wordId);
-                ProcessCatWord(db, model, wordId, out catWordId);
-                ProcessTranslation(db, model, catWordId, out commaError);
-            }
-            else
-            {
-                ViewData["LangId"] = langId;
-                ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
-                ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
-                ViewData["ReturnController"] = returnController;
-                ViewData["ReturnAction"] = returnAction;
                 return View(model);
             }
 
-            if (commaError)
-            {
-                ModelState.AddModelError("Translation", "Некоректний формат введення");
-                var catWord = db.CategorizedWords.Find(catWordId);
-                var word = db.Words.Find(wordId);
-                db.CategorizedWords.Remove(catWord);
-                db.Words.Remove(word);
-                db.SaveChanges();
-            }
-            else
+            if (ValidateComma(commaError, langId, wordId, catWordId, returnController, returnAction, db))
             {
                 return returnController.Equals("Home") ? RedirectToAction("Create", new { returnController = returnController, returnAction = returnAction })
                     : RedirectToAction("Create", new { returnController = returnController, returnAction = returnAction, langId = langId });
             }
 
-            ViewData["LangId"] = langId;
-            ViewData["ReturnController"] = returnController;
-            ViewData["ReturnAction"] = returnAction;
-            ViewData["LanguageId"] = new SelectList(db.Languages, "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(db.Categories, "Id", "Name");
+            FillViewData(langId, returnController, returnAction, db);
             return View(model);
         }
 
@@ -99,16 +72,8 @@ namespace Lexiconn.Controllers
             var langList = new SelectList(db.Languages, "Id", "Name");
             var catList = new SelectList(db.Categories, "Id", "Name");
 
-            ViewData["WordId"] = wordId;
-            ViewData["CatWordId"] = catWordId;
-            ViewData["LangId"] = langId;
-            ViewData["CatId"] = catId;
-            ViewData["TranslationIds"] = translationIds;
-            ViewData["LanguageList"] = langList;
-            ViewData["CategoryList"] = catList;
-            ViewData["OldTranslation"] = translation;
-            ViewData["ReturnController"] = returnController;
-            ViewData["ReturnAction"] = returnAction;
+            FillViewData(wordId, catId, catWordId, translationIds);
+            FillViewData(langId, returnController, returnAction, db);
 
             InitModel(model, db, langId, catId, word, translation);
             return View(model);
@@ -126,10 +91,7 @@ namespace Lexiconn.Controllers
                 UpdateWord(word, wordId, ref langId, db);
                 UpdateCatWord(catWordId, catId, db);
                 UpdateTranslations(translationIds, translation, catWordId, db);
-
-                ViewData["ReturnAction"] = returnAction;
-                ViewData["ReturnController"] = returnController;
-                ViewData["LangId"] = langId;
+                FillViewData(langId, returnController, returnAction);
 
                 return RedirectToAction(returnAction, returnController, new { langId = langId });
             }
@@ -137,15 +99,6 @@ namespace Lexiconn.Controllers
             var langList = new SelectList(db.Languages, "Id", "Name");
             var catList = new SelectList(db.Categories, "Id", "Name");
 
-            ViewData["ReturnAction"] = returnAction;
-            ViewData["ReturnController"] = returnController;
-            ViewData["WordId"] = wordId;
-            ViewData["CatWordId"] = catWordId;
-            ViewData["LangId"] = langId;
-            ViewData["CatId"] = catId;
-            ViewData["TranslationIds"] = translationIds;
-            ViewData["LanguageList"] = langList;
-            ViewData["CategoryList"] = catList;
 
             var model = new WordData();
             InitModel(model, db, langId, catId, word, translation);
@@ -172,9 +125,7 @@ namespace Lexiconn.Controllers
                 db.SaveChanges();
             }
 
-            ViewData["ReturnAction"] = returnAction;
-            ViewData["ReturnController"] = returnController;
-            ViewData["LangId"] = langId;
+            FillViewData(langId, returnController, returnAction);
 
             return RedirectToAction(returnAction, returnController, new { langId = langId });
         }
@@ -379,6 +330,71 @@ namespace Lexiconn.Controllers
                 }
             }
             db.SaveChanges();
+        }
+
+        private bool ValidateModel(WordData model, int langId, out int wordId, out int catWordId, out bool commaError, string returnController, string returnAction, DBDictionaryContext db)
+        {
+            wordId = 0;
+            catWordId = 0;
+            commaError = false;
+
+            if (ModelState.IsValid)
+            {
+                ProcessWord(db, model, out wordId);
+                ProcessCatWord(db, model, wordId, out catWordId);
+                ProcessTranslation(db, model, catWordId, out commaError);
+                return true;
+            }
+            else
+            {
+                FillViewData(langId, returnController, returnAction, db);
+                return false;
+            }
+        }
+
+        private bool ValidateComma(bool commaError, int langId, int wordId, int catWordId, string returnController, string returnAction, DBDictionaryContext db)
+        {
+            if (commaError)
+            {
+                ModelState.AddModelError("Translation", "Некоректний формат введення");
+                
+                var catWord = db.CategorizedWords.Find(catWordId);
+                var word = db.Words.Find(wordId);
+
+                db.CategorizedWords.Remove(catWord);
+                db.Words.Remove(word);
+                db.SaveChanges();
+                
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private void FillViewData(int langId, string returnController, string returnAction, DBDictionaryContext db)
+        {
+            ViewData["LangId"] = langId;
+            ViewData["LanguageList"] = new SelectList(db.Languages, "Id", "Name");
+            ViewData["CategoryList"] = new SelectList(db.Categories, "Id", "Name");
+            ViewData["ReturnController"] = returnController;
+            ViewData["ReturnAction"] = returnAction;
+        }
+
+        private void FillViewData(int langId, string returnController, string returnAction)
+        {
+            ViewData["LangId"] = langId;
+            ViewData["ReturnController"] = returnController;
+            ViewData["ReturnAction"] = returnAction;
+        }
+
+        private void FillViewData(int wordId, int catId, int catWordId, string translationIds)
+        {
+            ViewData["WordId"] = wordId;
+            ViewData["CatWordId"] = catWordId;
+            ViewData["CatId"] = catId;
+            ViewData["TranslationIds"] = translationIds;
         }
 
         private bool IsDuplicate(string word, int langId, int catId, DBDictionaryContext db)

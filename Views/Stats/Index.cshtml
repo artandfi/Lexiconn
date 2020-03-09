@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Статистика";
+}
+
+<h4>Статистика</h4>
+
+<div class="container">
+    <div id="langChart"></div>
+    <div id="catChart"></div>
+</div>
+
+@section scripts
+{ 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            $.get('/api/Charts/JsonLangStats', function (jsonLangStats) {
+                data = google.visualization.arrayToDataTable(jsonLangStats, false);
+
+                var option = {
+                    title: "Слова за мовами",
+                    width: 500,
+                    height: 400
+                };
+
+                chart = new google.visualization.PieChart(document.getElementById('langChart'));
+                chart.draw(data, option);
+            })
+        }
+    </script>
+
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            $.get('/api/Charts/JsonCatStats', function (jsonCatStats) {
+                data = google.visualization.arrayToDataTable(jsonCatStats, false);
+
+                var option = {
+                    title: "Слова за категоріями",
+                    width: 500,
+                    height: 400
+                };
+
+                chart = new google.visualization.BarChart(document.getElementById('catChart'));
+                chart.draw(data, option);
+            })
+        }
+    </script>
+}

@@ -14,8 +14,9 @@ namespace Lexiconn
 
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Поле необхідно заповнити")]
         [Display(Name = "Мова")]
+        [Required(ErrorMessage = "Поле необхідно заповнити")]
+        [StringLength(50, ErrorMessage = "Довжина має не перевищувати 50 символів")]
         public string Name { get; set; }
 
         public virtual ICollection<Word> Words { get; set; }

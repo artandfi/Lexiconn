@@ -15,6 +15,7 @@ namespace Lexiconn
 
         [Required(ErrorMessage = "Поле необхідно заповнити")]
         [Display(Name = "Назва")]
+        [StringLength(50, ErrorMessage = "Довжина має не перевищувати 50 символів")]
         public string Name { get; set; }
 
         public virtual ICollection<CategorizedWord> CategorizedWords { get; set; }
