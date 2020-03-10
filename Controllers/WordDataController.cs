@@ -115,29 +115,26 @@ namespace Lexiconn.Controllers
             var catWordEntity = db.CategorizedWords.First(cw => cw.WordId == wordEntity.Id && cw.CategoryId == catId);
             var translationsEntity = db.Translations.Where(t => t.CategorizedWordId == catWordEntity.Id).ToList();
 
-            db.RemoveRange(translationsEntity);
             db.Remove(catWordEntity);
-            db.SaveChanges();
-
+            
             if (!db.CategorizedWords.Any(cw => cw.WordId == wordEntity.Id))
             {
                 db.Remove(wordEntity);
-                db.SaveChanges();
             }
 
+            db.SaveChanges();
+            
             FillViewData(langId, returnController, returnAction);
 
             return RedirectToAction(returnAction, returnController, new { langId = langId });
         }
 
-        private void ProcessWord(DBDictionaryContext db, WordData model, out int wordId)
+        private void CreateWord(DBDictionaryContext db, WordData model, out int wordId)
         {
             var word = new Word();
             word.LanguageId = model.LanguageId;
             word.ThisWord = model.Word;
 
-            // Check if such word already exists in table, if it does, then resolve existing one's ID
-            // (here, words are guaranteedly distinct)
             var sameWord = db.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word));
 
             if (sameWord == null)
@@ -152,7 +149,7 @@ namespace Lexiconn.Controllers
             }
         }
 
-        private void ProcessCatWord(DBDictionaryContext db, WordData model, int wordId, out int catWordId)
+        private void CreateCatWord(DBDictionaryContext db, WordData model, int wordId, out int catWordId)
         {
             var catWord = new CategorizedWord();
             catWord.WordId = wordId;
@@ -163,7 +160,7 @@ namespace Lexiconn.Controllers
             catWordId = catWord.Id;
         }
 
-        private void ProcessTranslation(DBDictionaryContext db, WordData model, int catWordId, out bool error)
+        private void CreateTranslation(DBDictionaryContext db, WordData model, int catWordId, out bool error)
         {
             error = false;
             List<Translation> translations = new List<Translation>();
@@ -219,7 +216,6 @@ namespace Lexiconn.Controllers
             }
             
             curTranslation += cur;
-
             return true;
         }
 
@@ -243,7 +239,6 @@ namespace Lexiconn.Controllers
                 if (cur != ' ' || cur == ' ' && prev != ' ' && prev != ',')
                     curTranslation += cur;
             }
-
             return true;
         }
 
@@ -340,9 +335,9 @@ namespace Lexiconn.Controllers
 
             if (ModelState.IsValid)
             {
-                ProcessWord(db, model, out wordId);
-                ProcessCatWord(db, model, wordId, out catWordId);
-                ProcessTranslation(db, model, catWordId, out commaError);
+                CreateWord(db, model, out wordId);
+                CreateCatWord(db, model, wordId, out catWordId);
+                CreateTranslation(db, model, catWordId, out commaError);
                 return true;
             }
             else

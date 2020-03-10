@@ -25,7 +25,6 @@ namespace Lexiconn
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=ROOFLER\\SQLEXPRESS;Database=DBDictionary; Trusted_Connection=True;");
             }
         }
@@ -53,13 +52,13 @@ namespace Lexiconn
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.CategorizedWords)
                     .HasForeignKey(d => d.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_CategorizedWords_Categories");
 
                 entity.HasOne(d => d.Word)
                     .WithMany(p => p.CategorizedWords)
                     .HasForeignKey(d => d.WordId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_CategorizedWords_Words");
             });
 
@@ -87,7 +86,7 @@ namespace Lexiconn
                 entity.HasOne(d => d.CategorizedWord)
                     .WithMany(p => p.Translations)
                     .HasForeignKey(d => d.CategorizedWordId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Translations_CategorizedWords");
             });
 
@@ -105,7 +104,7 @@ namespace Lexiconn
                 entity.HasOne(d => d.Language)
                     .WithMany(p => p.Words)
                     .HasForeignKey(d => d.LanguageId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Words_Languages");
             });
 

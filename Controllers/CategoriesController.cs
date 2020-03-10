@@ -146,22 +146,8 @@ namespace Lexiconn.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
-            var catWords = await _context.CategorizedWords.Where(cw => cw.CategoryId == id).ToListAsync();
-            var words = new List<Word>();
-            var translations = new List<Translation>();
-
-            foreach (var catWord in catWords)
-            {
-                var word = await _context.Words.FirstOrDefaultAsync(w => w.Id == catWord.WordId);
-                words.Add(word);
-                var trList = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                translations.AddRange(trList);
-            }
-
-            _context.Translations.RemoveRange(translations);
-            _context.CategorizedWords.RemoveRange(catWords);
-            _context.Words.RemoveRange(words);
             _context.Categories.Remove(category);
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

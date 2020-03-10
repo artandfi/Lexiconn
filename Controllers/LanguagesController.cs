@@ -54,7 +54,6 @@ namespace Lexiconn.Controllers
         private void FillModel(WordData model, Language language, List<Word> words, CategorizedWord catWord)
         {
             model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
-
             model.LanguageId = language.Id;
             model.Language = language.Name;
 
@@ -178,25 +177,6 @@ namespace Lexiconn.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var language = await _context.Languages.FindAsync(id);
-            var words = await _context.Words.Where(w => w.LanguageId == id).ToListAsync();
-            var catWords = new List<CategorizedWord>();
-            var translations = new List<Translation>();
-
-            foreach (var word in words)
-            {
-                var cwList = await _context.CategorizedWords.Where(cw => cw.WordId == word.Id).ToListAsync();
-                catWords.AddRange(cwList);
-            }
-
-            foreach (var catWord in catWords)
-            {
-                var trList = await _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToListAsync();
-                translations.AddRange(trList);
-            }
-
-            _context.Translations.RemoveRange(translations);
-            _context.CategorizedWords.RemoveRange(catWords);
-            _context.Words.RemoveRange(words);
             _context.Languages.Remove(language);
 
             await _context.SaveChangesAsync();
