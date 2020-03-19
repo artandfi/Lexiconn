@@ -1,30 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Lexiconn;
 
 namespace Lexiconn.Controllers
 {
     public class CategoriesController : Controller
     {
+        private const string ERR_CAT_EXISTS = "Введена категорія вже додана";
         private readonly DBDictionaryContext _context;
 
+        /// <summary>
+        /// Creates the Categories Controller and provides it with a database context.
+        /// </summary>
+        /// <param name="context">An object to interact with the database.</param>
         public CategoriesController(DBDictionaryContext context)
         {
             _context = context;
         }
 
         // GET: Categories
+        /// <summary>
+        /// Returns a list of available categories to display.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
             return View(await _context.Categories.ToListAsync());
         }
 
-        // GET: Categories/Details/5
+        // GET: Categories/Details/*ID*
+        /// <summary>
+        /// Returns a detalized list of word contents for every category.
+        /// </summary>
+        /// <param name="id">Selected category's ID.</param>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,14 +51,19 @@ namespace Lexiconn.Controllers
         }
 
         // GET: Categories/Create
+        /// <summary>
+        /// Returns a view for adding a new category.
+        /// </summary>
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Categories/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// Adds the specified category to the database.
+        /// </summary>
+        /// <param name="category">A category to add.</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
@@ -59,7 +72,7 @@ namespace Lexiconn.Controllers
 
             if (duplicate)
             {
-                ModelState.AddModelError("Name", "Введена категорія вже додана");
+                ModelState.AddModelError("Name", ERR_CAT_EXISTS);
             }
 
             if (ModelState.IsValid)
@@ -71,7 +84,11 @@ namespace Lexiconn.Controllers
             return View(category);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Categories/Edit/*ID*
+        /// <summary>
+        /// Returns the view with info of the category to edit.
+        /// </summary>
+        /// <param name="id">Selected category's ID.</param>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,9 +104,13 @@ namespace Lexiconn.Controllers
             return View(category);
         }
 
-        // POST: Categories/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Categories/Edit/*ID*
+        /// <summary>
+        /// Updates the edited category if input was correct,
+        /// displays an error message if it wasn't.
+        /// </summary>
+        /// <param name="id">Selected category's ID.</param>
+        /// <param name="category">[Possibly] edited category.</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
@@ -122,36 +143,10 @@ namespace Lexiconn.Controllers
             return View(category);
         }
 
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
+        /// <summary>
+        /// Defines whether a category with specified ID is present in the database.
+        /// </summary>
+        /// <param name="id">Selected category's ID.</param>
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);

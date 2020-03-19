@@ -4,9 +4,19 @@
     ViewData["Title"] = ViewData["Language"];
 }
 
-
-
 <h1>@ViewData["Language"]</h1>
+
+<div>
+    @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
+    {
+        <input type="submit" value="Додати слово" class="btn btn-primary" />
+        <input type="hidden" name="langId" value="@ViewBag.LangId" />
+        <input type="hidden" name="returnController" value="Languages" />
+        <input type="hidden" name="returnAction" value="Details" />
+    }
+</div>
+
+<br />
 
 <table class="table">
     <thead>
@@ -38,18 +48,22 @@
                 <td>
                     <form asp-controller="WordData"
                           asp-action="Delete"
+                          asp-route-languageId="@item.LanguageId"
+                          asp-route-wordId="@item.WordId"
                           asp-route-word="@item.Word"
-                          asp-route-langId="@item.LanguageId"
-                          asp-route-catId="@item.CategoryId"
+                          asp-route-categoryId="@item.CategoryId"
+                          asp-route-catWordId="@item.CatWordId"
                           asp-route-translation="@item.Translation"
                           asp-route-translationIds="@item.TranslationIds"
                           asp-route-returnController="Languages"
                           asp-route-returnAction="Details">
                         <a asp-controller="WordData"
                            asp-action="Edit"
+                           asp-route-languageId="@item.LanguageId"
+                           asp-route-wordId="@item.WordId"
                            asp-route-word="@item.Word"
-                           asp-route-langId="@item.LanguageId"
-                           asp-route-catId="@item.CategoryId"
+                           asp-route-categoryId="@item.CategoryId"
+                           asp-route-catWordId="@item.CatWordId"
                            asp-route-translation="@item.Translation"
                            asp-route-translationIds="@item.TranslationIds"
                            asp-route-returnController="Languages"
@@ -68,5 +82,5 @@
 <hr />
 
 <a>
-    @Html.ActionLink("На головну", "Index", "Home")
+    @Html.ActionLink("Назад до списку мов", "Index", "Languages")
 </a>

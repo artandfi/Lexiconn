@@ -1,74 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Lexiconn.Models;
 using Microsoft.EntityFrameworkCore;
+using Lexiconn.Models;
 
 namespace Lexiconn.Controllers
 {
     public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
+    { 
+        private readonly DBDictionaryContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        /// <summary>
+        /// Creates the Home Controller and provides it with a database context.
+        /// </summary>
+        /// <param name="context">An object to interact with the database.</param>
+        public HomeController(DBDictionaryContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        // REFACTOR: split into several methods, this class surely lacks ones
+        /// <summary>
+        /// Returns the view with all the word records to display on the home page.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
-            var db = new DBDictionaryContext();
             var modelList = new List<WordData>();
-            var catWords = await db.CategorizedWords.ToListAsync();
+            var catWords = await _context.CategorizedWords.ToListAsync();
             
             foreach (var catWord in catWords)
             {
                 var model = new WordData();
-                FillModel(model, catWord, db);
+                FillModel(model, catWord);
                 modelList.Add(model);
             }
 
             return View(modelList);
         }
 
-        private void FillModel(WordData model, CategorizedWord catWord, DBDictionaryContext db)
+        /// <summary>
+        /// Fills the word record model with all necessary information to store and display.
+        /// </summary>
+        /// <param name="model">The word record model.</param>
+        /// <param name="catWord">Current categorized word in the foreach loop.</param>
+        private void FillModel(WordData model, CategorizedWord catWord)
         {
-            var word = db.Words.FirstOrDefault(w => w.Id == catWord.WordId);
-            model.Word = word.ThisWord;
-
-            var language = db.Languages.FirstOrDefault(l => l.Id == word.LanguageId);
-            model.Language = language.Name;
-            model.LanguageId = word.LanguageId;
-
-            var category = db.Categories.FirstOrDefault(c => c.Id == catWord.CategoryId);
-            model.Category = catWord.Category.Name;
-            model.CategoryId = catWord.CategoryId;
-
-            var translations = db.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
+            var word = _context.Words.FirstOrDefault(w => w.Id == catWord.WordId);
+            var language = _context.Languages.FirstOrDefault(l => l.Id == word.LanguageId);
+            var category = _context.Categories.FirstOrDefault(c => c.Id == catWord.CategoryId);
+            var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
             var translationIds = new List<int>();
 
             foreach (var translation in translations)
             {
                 translationIds.Add(translation.Id);
             }
+
+            model.Word = word.ThisWord;
+            model.WordId = catWord.WordId;
+            model.Language = language.Name;
+            model.LanguageId = word.LanguageId;
+            model.Category = catWord.Category.Name;
+            model.CategoryId = catWord.CategoryId;
+            model.CatWordId = catWord.Id;
             model.TranslationIds = string.Join(",", translationIds);
             model.SetCommaTranslations(translations);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

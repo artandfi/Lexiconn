@@ -52,23 +52,28 @@
                 </td>
                 <td>
                     <form asp-controller="WordData"
-                          asp-action="Delete"
-                          asp-route-word="@item.Word"
-                          asp-route-langId="@item.LanguageId"
-                          asp-route-catId="@item.CategoryId"
-                          asp-route-translation="@item.Translation"
-                          asp-route-translationIds="@item.TranslationIds"
-                          asp-route-returnController="Home"
-                          asp-route-returnAction="Index">
+                        asp-action="Delete"
+                        asp-route-languageId="@item.LanguageId"
+                        asp-route-wordId="@item.WordId"
+                        asp-route-word="@item.Word"
+                        asp-route-categoryId="@item.CategoryId"
+                        asp-route-catWordId="@item.CatWordId"
+                        asp-route-translation="@item.Translation"
+                        asp-route-translationIds="@item.TranslationIds"
+                        asp-route-returnController="Home"
+                        asp-route-returnAction="Index">
+
                         <a asp-controller="WordData"
-                           asp-action="Edit"
-                           asp-route-word="@item.Word"
-                           asp-route-langId="@item.LanguageId"
-                           asp-route-catId="@item.CategoryId"
-                           asp-route-translation="@item.Translation"
-                           asp-route-translationIds="@item.TranslationIds"
-                           asp-route-returnController="Home"
-                           asp-route-returnAction="Index">Редагувати</a> |
+                            asp-action="Edit"
+                            asp-route-languageId="@item.LanguageId"
+                            asp-route-wordId="@item.WordId"
+                            asp-route-word="@item.Word"
+                            asp-route-categoryId="@item.CategoryId"
+                            asp-route-catWordId="@item.CatWordId"
+                            asp-route-translation="@item.Translation"
+                            asp-route-translationIds="@item.TranslationIds"
+                            asp-route-returnController="Home"
+                            asp-route-returnAction="Index">Редагувати</a> |
                         <button type="submit"
                                 class="btn btn-danger"
                                 onclick="return confirm('Ви впевнені, що хочете видалити цей запис?')">

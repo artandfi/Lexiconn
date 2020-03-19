@@ -20,12 +20,12 @@
 
             <div class="form-group">
                 <label asp-for="LanguageId" class="control-label"></label>
-                <select name="langId" asp-for="LanguageId" class="form-control" asp-items="@ViewBag.LanguageList"></select>
+                <select asp-for="LanguageId" class="form-control" asp-items="@ViewBag.LanguageList"></select>
             </div>
 
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
-                <select name="catId" asp-for="CategoryId" class="form-control" asp-items="@ViewBag.CategoryList"></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.CategoryList"></select>
             </div>
 
             <div class="form-group">
@@ -39,15 +39,9 @@
             </div>
 
             <div class="form-group">
-                <input type="hidden" name="wordId" value="@ViewBag.WordId" />
-            </div>
-
-            <div class="form-group">
-                <input type="hidden" name="translationIds" value="@ViewBag.TranslationIds" />
-            </div>
-
-            <div class="form-group">
-                <input type="hidden" name="catWordId" value="@ViewBag.CatWordId" />
+                <input asp-for="WordId" type="hidden" value="@Model.WordId" />
+                <input asp-for="CatWordId" type="hidden" name="catWordId" value="@Model.CatWordId" />
+                <input asp-for="TranslationIds" type="hidden" value="@Model.TranslationIds" />
             </div>
 
             <input type="hidden" name="langId" value="@ViewData["LangId"]" />
