@@ -58,8 +58,10 @@ namespace Lexiconn.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(WordData model, string returnController, string returnAction)
         {
+            int langId = returnController.Equals("Languages") ? model.LanguageId : 0;
+
             FillReturnPath(returnController, returnAction);
-            FillSelectLists(model.LanguageId);
+            FillSelectLists(langId);
 
             if (IsDuplicate(model))
             {
@@ -74,7 +76,7 @@ namespace Lexiconn.Controllers
                 
                 if (ValidateComma(commaError, wordId))
                 {
-                    return RedirectToAction("Create", new { langId = model.LanguageId, returnController = returnController, returnAction = returnAction });
+                    return RedirectToAction("Create", new { langId = langId, returnController = returnController, returnAction = returnAction });
                 }
             }
 
