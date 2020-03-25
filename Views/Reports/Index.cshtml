@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Звіти";
+}
+
+<h3>Звіти</h3>
+
+<hr/>
+
+<div>
+    <h4>Надіслати Excel-звіт</h4>
+    @using (Html.BeginForm("Import", "Reports", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+    {
+        <div>
+            <input type="file" accept=".xls, .xlsx" name="fileExcel" id="fileExcel">
+        </div>
+        <br />
+        <div class="form-group">
+            <input type="submit" value="Надіслати" class="btn btn-primary">
+        </div>
+    }
+</div>
+
+
+@section scripts
+{
+    <script type="text/javascript"></script>
+    <script>
+        var fileUpload = document.getElementById('fileExcel');
+
+        fileUpload.onchange = function (e) {
+            var ext = this.value.match(/\.([^\.]+)$/)[1];
+            if (ext != 'xls' || ext != 'xlsx') {
+                alert('Виберіть EXCEL-файл');
+                this.value = '';
+            }
+        }
+    </script>
+}
