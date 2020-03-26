@@ -35,23 +35,42 @@
             </div>
 
             <div class="form-group">
-                <input type="submit"
-                       value="Зберегти"
-                       class="btn btn-primary"
-                       onclick="return confirm('Зберегти внесені зміни?')" />
-            </div>
-
-            <div class="form-group">
                 <input asp-for="WordId" type="hidden" value="@Model.WordId" />
                 <input asp-for="CatWordId" type="hidden" name="catWordId" value="@Model.CatWordId" />
                 <input asp-for="TranslationIds" type="hidden" value="@Model.TranslationIds" />
             </div>
 
-            <input type="hidden" name="langId" value="@ViewData["LangId"]" />
-            <input type="hidden" name="returnController" value="@ViewData["ReturnController"]" />
-            <input type="hidden" name="returnAction" value="@ViewData["ReturnAction"]" />
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm">
+                    Зберегти
+                </button>
+            </div>
 
+            <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Попередження</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body delete-modal-body">
+                            Ви впевнені, що хочете зберегти внесені зміни?
+                        </div>
+                        <div class="modal-footer">
+                                <button type="submit" class="btn btn-danger">Так</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Ні</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" name="langId" value="@ViewBag.LangId" />
+            <input type="hidden" name="returnController" value="@ViewBag.ReturnController" />
+            <input type="hidden" name="returnAction" value="@ViewBag.ReturnAction" />
         </form>
+
         <a>
             @Html.ActionLink((ViewBag.ReturnController as string).Equals("Home") ? "На головну" : "Назад", ViewBag.ReturnAction as string, ViewBag.ReturnController as string, new { langId = ViewBag.LangId })
         </a>

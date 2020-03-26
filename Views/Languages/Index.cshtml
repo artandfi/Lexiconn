@@ -19,24 +19,45 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <form asp-action="Delete" asp-route-id="@item.Id">
+        @foreach (var item in Model)
+        {
+            var targetId = "#modal" + item.Id;
+            var modalId = "modal" + item.Id;
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
                     <a asp-action="Details" asp-route-langId="@item.Id">Список слів</a> |
-                    <button type="submit"
-                            class="btn btn-danger"
-                            onclick="return confirm('Ви впевнені, що хочете видалити цю мову?')">
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
                         Видалити
                     </button>
-                </form>
-            </td>
-        </tr>
-}
+
+                    <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Попередження</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body delete-modal-body">
+                                    Ви впевнені, що хочете видалити цю мову?
+                                </div>
+                                <div class="modal-footer">
+                                    <form asp-action="Delete" asp-route-id="@item.Id">
+                                        <button type="submit" class="btn btn-danger">Так</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Ні</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 

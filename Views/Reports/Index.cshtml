@@ -30,7 +30,7 @@
         fileUpload.onchange = function (e) {
             var ext = this.value.match(/\.([^\.]+)$/)[1];
             if (ext != 'xls' || ext != 'xlsx') {
-                alert('Виберіть EXCEL-файл');
+                alert('Оберіть EXCEL-файл');
                 this.value = '';
             }
         }

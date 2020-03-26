@@ -13,7 +13,6 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lex
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.TagHelpers.output.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.RazorCoreGenerate.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Home\Index.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Home\Privacy.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Shared\Error.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_Layout.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_ValidationScriptsPartial.cshtml.g.cs
@@ -157,12 +156,10 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\tr\
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Create.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Delete.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Details.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Edit.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Languages\Index.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Create.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Delete.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Details.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Edit.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Categories\Index.cshtml.g.cs
