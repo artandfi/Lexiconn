@@ -7,13 +7,13 @@
 <h1>@ViewData["Language"]</h1>
 
 <div>
-    @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
-    {
-        <input type="submit" value="Додати слово" class="btn btn-primary" />
-        <input type="hidden" name="langId" value="@ViewBag.LangId" />
-        <input type="hidden" name="returnController" value="Languages" />
-        <input type="hidden" name="returnAction" value="Details" />
-    }
+    <a asp-controller="WordData"
+       asp-action="Create"
+       asp-route-langId="@ViewBag.LangId"
+       asp-route-returnController="Languages"
+       asp-route-returnAction="Details">
+        Додати слово
+    </a>
 </div>
 
 <br />
@@ -58,7 +58,9 @@
                        asp-route-translation="@item.Translation"
                        asp-route-translationIds="@item.TranslationIds"
                        asp-route-returnController="Languages"
-                       asp-route-returnAction="Details">Редагувати</a> |
+                       asp-route-returnAction="Details">
+                        Редагувати
+                    </a> |
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
                         Видалити
                     </button>

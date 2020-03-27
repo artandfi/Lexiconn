@@ -49,21 +49,16 @@ namespace Lexiconn.Controllers
             var language = _context.Languages.FirstOrDefault(l => l.Id == word.LanguageId);
             var category = _context.Categories.FirstOrDefault(c => c.Id == catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
-            var translationIds = new List<int>();
-
-            foreach (var translation in translations)
-            {
-                translationIds.Add(translation.Id);
-            }
+            
 
             model.Word = word.ThisWord;
             model.WordId = catWord.WordId;
             model.Language = language.Name;
             model.LanguageId = word.LanguageId;
-            model.Category = catWord.Category.Name;
+            model.Category = catWord.Category.Name ;
             model.CategoryId = catWord.CategoryId;
             model.CatWordId = catWord.Id;
-            model.TranslationIds = string.Join(",", translationIds);
+            model.SetTranslationIds(translations);
             model.SetCommaTranslations(translations);
         }
     }

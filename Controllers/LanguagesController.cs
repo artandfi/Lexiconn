@@ -71,12 +71,6 @@ namespace Lexiconn.Controllers
         {
             var category = _context.Categories.Find(catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
-            var translationIds = new List<int>();
-
-            foreach (var translation in translations)
-            {
-                translationIds.Add(translation.Id);
-            }
 
             model.WordId = catWord.WordId;
             model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
@@ -85,7 +79,7 @@ namespace Lexiconn.Controllers
             model.CategoryId = catWord.CategoryId;
             model.Category = catWord.Category.Name;
             model.CatWordId = catWord.Id;
-            model.TranslationIds = string.Join(",", translationIds);
+            model.SetTranslationIds(translations);
             model.SetCommaTranslations(translations);
         }
 
