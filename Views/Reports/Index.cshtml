@@ -1,4 +1,4 @@
-﻿@model Lexiconn.Models.Report
+﻿@model Lexiconn.Models.WordData
 
 @{
     ViewData["Title"] = "Звіти";
@@ -16,9 +16,38 @@
         </div>
         <br />
         <div class="form-group">
-            <input type="submit" class="btn btn-primary" name="submit" id="submit" value="Надіслати" disabled>
+            <input type="submit" class="btn btn-primary" name="submit" id="submit" value="Надіслати" disabled />
         </div>
     }
+</div>
+
+<div>
+    <h4>Завантажити Excel-звіт</h4>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h5>Фільтри</h5>
+            <form asp-action="Export">
+                <div class="form-group">
+                    <label asp-for="LanguageId" class="control-label"></label>
+                    <select asp-for="LanguageId" class="form-control" asp-items="@ViewBag.LanguageList">
+                        <option selected>–Не вибрана–</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.CategoryList">
+                        <option selected>–Не вибрана–</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Завантажити" />
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="errorPopup" tabindex="-1" role="alertdialog" aria-hidden="true">
@@ -31,7 +60,7 @@
                 </button>
             </div>
             <div class="modal-body" id="errorText">
-                @Model.Error
+                @ViewBag.Error
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">ОК</button>
@@ -39,10 +68,11 @@
         </div>
     </div>
 </div>
-    
+
 
 @section scripts
 {
+    <!--Checks if file chosen is Excel book-->
     <script>
         var fileControl = document.getElementById("fileExcel");
         fileControl.addEventListener("change", function (event) {
@@ -62,9 +92,10 @@
         }, false);
     </script>
 
+    <!--Displays error info if file uploaded was faulty-->
     <script>
         window.addEventListener("load", function () {
-            if ('@Model.ErrorPopupFlag' == 1) {
+            if ('@ViewBag.ErrorPopupFlag' == 1) {
                 $("#errorPopup").modal();
             }
         });

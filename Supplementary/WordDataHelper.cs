@@ -9,6 +9,11 @@ namespace Lexiconn.Supplementary
     {
         private readonly DBDictionaryContext _context;
 
+        /// <summary>
+        /// Creates a Word Helper object to attach to the classes
+        /// who need its supplementary methods.
+        /// </summary>
+        /// <param name="context">An object to work with the DB from the host class.</param>
         public WordDataHelper(DBDictionaryContext context)
         {
             _context = context;
@@ -275,6 +280,41 @@ namespace Lexiconn.Supplementary
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Transforms the given list of translation IDs into string (with commas).
+        /// </summary>
+        /// <param name="translations">List of the translations whose IDs need to be set.</param>
+        public string TranslationIdsToString(List<Translation> translations)
+        {
+            var translationIds = new List<int>();
+
+            foreach (var translation in translations)
+            {
+                translationIds.Add(translation.Id);
+            }
+            return string.Join(",", translationIds);
+        }
+
+        /// <summary>
+        /// Transforms the given translations list into string (with commas).
+        /// </summary>
+        /// <param name="translations">Translations list to be transformed.</param>
+        public string TranslationsToString(List<Translation> translations)
+        {
+            string commaTranslations = "";
+
+            for (int i = 0; i < translations.Count - 1; i++)
+            {
+                commaTranslations += translations[i].ThisTranslation + ", ";
+            }
+
+            if (translations.Count != 0)
+            {
+                commaTranslations += translations[translations.Count - 1].ThisTranslation;
+            }
+            return commaTranslations;
         }
     }
 }

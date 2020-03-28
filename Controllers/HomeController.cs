@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lexiconn.Models;
+using Lexiconn.Supplementary;
 
 namespace Lexiconn.Controllers
 {
@@ -45,11 +46,12 @@ namespace Lexiconn.Controllers
         /// <param name="catWord">Current categorized word in the foreach loop.</param>
         private void FillModel(WordData model, CategorizedWord catWord)
         {
-            var word = _context.Words.FirstOrDefault(w => w.Id == catWord.WordId);
-            var language = _context.Languages.FirstOrDefault(l => l.Id == word.LanguageId);
-            var category = _context.Categories.FirstOrDefault(c => c.Id == catWord.CategoryId);
+            var word = _context.Words.Find(catWord.WordId);
+            var language = _context.Languages.Find(word.LanguageId);
+            var category = _context.Categories.Find(catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
-            
+
+            WordDataHelper helper = new WordDataHelper(_context);
 
             model.Word = word.ThisWord;
             model.WordId = catWord.WordId;
@@ -58,8 +60,8 @@ namespace Lexiconn.Controllers
             model.Category = catWord.Category.Name ;
             model.CategoryId = catWord.CategoryId;
             model.CatWordId = catWord.Id;
-            model.SetTranslationIds(translations);
-            model.SetCommaTranslations(translations);
+            model.TranslationIds = helper.TranslationIdsToString(translations);
+            model.Translation = helper.TranslationsToString(translations);
         }
     }
 }

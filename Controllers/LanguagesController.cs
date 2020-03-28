@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lexiconn.Models;
+using Lexiconn.Supplementary;
 
 namespace Lexiconn.Controllers
 {
@@ -39,13 +40,12 @@ namespace Lexiconn.Controllers
         {
             var modelList = new List<WordData>();
             var catWords = new List<CategorizedWord>();
-            var words = await _context.Words.Where(w => w.LanguageId == langId).ToListAsync();
+            var words = await _context.Words.Where(w => w.LanguageId == langId).Include("CategorizedWords").ToListAsync();
             var language = _context.Languages.Find(langId);
 
             foreach (var word in words)
             {
-                var cw = await _context.CategorizedWords.Where(c => c.WordId == word.Id).ToListAsync();
-                catWords.AddRange(cw);
+                catWords.AddRange(word.CategorizedWords);
             }
             
             foreach (var catWord in catWords)
@@ -71,6 +71,7 @@ namespace Lexiconn.Controllers
         {
             var category = _context.Categories.Find(catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
+            var helper = new WordDataHelper(_context);
 
             model.WordId = catWord.WordId;
             model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
@@ -79,8 +80,8 @@ namespace Lexiconn.Controllers
             model.CategoryId = catWord.CategoryId;
             model.Category = catWord.Category.Name;
             model.CatWordId = catWord.Id;
-            model.SetTranslationIds(translations);
-            model.SetCommaTranslations(translations);
+            model.TranslationIds = helper.TranslationIdsToString(translations);
+            model.Translation = helper.TranslationsToString(translations);
         }
 
         // GET: Languages/Create

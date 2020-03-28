@@ -16,6 +16,10 @@ namespace Lexiconn.Controllers
         private readonly DBDictionaryContext _context;
         private readonly WordDataHelper _helper;
 
+        /// <summary>
+        /// Creates the Word Data Controller and provides it with a database context and a helper object.
+        /// </summary>
+        /// <param name="context">An object to interact with the database.</param>
         public WordDataController(DBDictionaryContext context)
         {
             _context = context;
