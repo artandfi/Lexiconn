@@ -180,3 +180,4 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\run
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Drawing.Common.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Reports\Index.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Info\Index.cshtml.g.cs
