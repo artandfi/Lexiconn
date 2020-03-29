@@ -121,19 +121,25 @@ namespace Lexiconn.Controllers
         {
             ViewBag.LangId = model.LanguageId;
             FillReturnPath(returnController, returnAction);
+            FillSelectLists(model.LanguageId);
 
             if (ModelState.IsValid)
             {
-                if (_helper.UpdateTranslations(model))
+                if (IsUpdateDuplicate(model))
                 {
-                    _helper.UpdateWord(model);
-                    _helper.UpdateCatWord(model);
-                    return RedirectToAction(returnAction, returnController, new { langId = model.LanguageId });
+                    ModelState.AddModelError("Translation", ERR_REC_EXISTS);
                 }
-
-                ModelState.AddModelError("Translation", ERR_INPUT);
+                else
+                {
+                    if (_helper.UpdateTranslations(model))
+                    {
+                        _helper.UpdateWord(model);
+                        _helper.UpdateCatWord(model);
+                        return RedirectToAction(returnAction, returnController, new { langId = model.LanguageId });
+                    }
+                    ModelState.AddModelError("Translation", ERR_INPUT);
+                }
             }
-
             return View(model);
         }
 
@@ -172,8 +178,17 @@ namespace Lexiconn.Controllers
         /// <param name="model">The word record to check.</param>
         private bool IsDuplicate(WordData model)
         {
-            var word = _context.Words.FirstOrDefault(x => x.ThisWord.Equals(model.Word)
-            && x.LanguageId == model.LanguageId);
+            var word = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word)
+            && w.LanguageId == model.LanguageId);
+
+            return word == null ? false : _context.CategorizedWords.Any(cw => cw.WordId == word.Id
+            && cw.CategoryId == model.CategoryId);
+        }
+
+        private bool IsUpdateDuplicate(WordData model)
+        {
+            var word = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word)
+            && w.LanguageId == model.LanguageId && w.Id != model.WordId);
 
             return word == null ? false : _context.CategorizedWords.Any(cw => cw.WordId == word.Id
             && cw.CategoryId == model.CategoryId);

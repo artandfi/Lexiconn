@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Lexiconn.Controllers
 {
-    public class InfoController : Controller
+    public class HelpController : Controller
     {
         public IActionResult Index()
         {
