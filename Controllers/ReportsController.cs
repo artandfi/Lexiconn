@@ -114,6 +114,7 @@ namespace Lexiconn.Controllers
         /// redirects back to controls with error message provided otherwise.
         /// </summary>
         /// <param name="criteria">The filtering criteria specified.</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Export(WordData criteria)
