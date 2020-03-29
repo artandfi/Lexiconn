@@ -256,18 +256,12 @@ namespace Lexiconn.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Determines whether a current record is duplicating the existing one.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="model">The current word record.</param>
         private bool IsDuplicate(WordData model)
         {
-            try
-            {
-                model.LanguageId = _context.Languages.First(l => l.Name.Equals(model.Language)).Id;
-                model.CategoryId = _context.Categories.First(c => c.Name.Equals(model.Category)).Id;
-            }
-            catch (Exception e)
+            if (!ResolveNewLangCat(model))
             {
                 return false;
             }
@@ -277,6 +271,35 @@ namespace Lexiconn.Controllers
 
             return word == null ? false : _context.CategorizedWords.Any(cw => cw.WordId == word.Id
             && cw.CategoryId == model.CategoryId);
+        }
+
+        /// <summary>
+        /// Resolves the presence of language and category in the DB.
+        /// </summary>
+        /// <param name="model">The current word record.</param>
+        private bool ResolveNewLangCat(WordData model)
+        {
+            var lang = _context.Languages.FirstOrDefault(l => l.Name.Equals(model.Language));
+            var cat = _context.Categories.FirstOrDefault(c => c.Name.Equals(model.Category));
+
+            if (lang == null)
+            {
+                if (cat != null)
+                {
+                    model.CategoryId = cat.Id;
+                }
+                return false;
+            }
+            else
+            {
+                model.LanguageId = lang.Id;
+                if (cat == null)
+                {
+                    return false;
+                }
+                model.CategoryId = cat.Id;
+            }
+            return true;
         }
 
         /// <summary>
