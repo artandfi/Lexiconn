@@ -178,7 +178,12 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\run
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard1.3\System.Data.SqlClient.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.0\System.Drawing.Common.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Drawing.Common.dll
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Reports\Index.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Info\Index.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Help\Index.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Identity.Core.dll
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Identity.Stores.dll
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\SignUp.cshtml.g.cs

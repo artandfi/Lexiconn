@@ -188,10 +188,17 @@ namespace Lexiconn.Controllers
         private bool IsUpdateDuplicate(WordData model)
         {
             var word = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word)
-            && w.LanguageId == model.LanguageId && w.Id != model.WordId);
+            && w.LanguageId == model.LanguageId);
+            
+            if (word == null)
+            {
+                return false;
+            }
 
-            return word == null ? false : _context.CategorizedWords.Any(cw => cw.WordId == word.Id
+            var catWord = _context.CategorizedWords.FirstOrDefault(cw => cw.WordId == word.Id
             && cw.CategoryId == model.CategoryId);
+
+            return catWord.Id != model.CatWordId;
         }
 
         /// <summary>

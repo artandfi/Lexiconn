@@ -1,0 +1,66 @@
+﻿@model Lexiconn.ViewModels.SignUpViewModel
+
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<h1>Реєстрація</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SignUp" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <br />
+                <input asp-for="Email" />
+                <br />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserName"></label>
+                <br />
+                <input asp-for="UserName" />
+                <br />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <br />
+                <input asp-for="Password" />
+                <br />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PasswordConfirm"></label>
+                <br />
+                <input asp-for="PasswordConfirm" />
+                <br />
+                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Зареєструватися" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $(window).keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}
