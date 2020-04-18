@@ -6,18 +6,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Lexiconn.Models;
 using Lexiconn.ViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace Lexiconn.Controllers
 {
     public class AccountsController : Controller
     {
+        private readonly DBDictionaryContext _context;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IHttpContextAccessor _httpAccessor;
 
-        public AccountsController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountsController(UserManager<User> userManager, SignInManager<User> signInManager, DBDictionaryContext context, IHttpContextAccessor httpAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
+            _httpAccessor = httpAccessor;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = _userManager.GetUserId(HttpContext.User);
+            User user = await _userManager.FindByIdAsync(userId);
+            ViewBag.WordCount = _context.Words.Count();
+            ViewBag.LangCount = _context.Languages.Count();
+            ViewBag.CatCount = _context.Categories.Count();
+            return View(user);
         }
 
         [HttpGet]
@@ -76,7 +92,7 @@ namespace Lexiconn.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Некоректний логін або пароль");
+                    ModelState.AddModelError("Password", "Некоректний логін або пароль");
                 }
             }
             return View(model);

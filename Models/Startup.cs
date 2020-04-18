@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Lexiconn.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.AspNetCore.Http;
 
 namespace Lexiconn
 {
@@ -44,6 +44,8 @@ namespace Lexiconn
                 options.Password.RequireLowercase = false;
             }
             ).AddEntityFrameworkStores<IdentityContext>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

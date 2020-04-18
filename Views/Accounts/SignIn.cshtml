@@ -7,4 +7,30 @@
 <h1>Вхід</h1>
 <hr />
 
-
+<form method="post" asp-controller="Accounts" asp-action="SignIn" asp-route-returnUrl="@Model.ReturnUrl">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="Email"></label>
+        <br />
+        <input asp-for="Email" />
+        <br />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <br />
+    <div>
+        <label asp-for="Password"></label>
+        <br />
+        <input asp-for="Password" />
+        <br />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <br />
+    <div>
+        <input asp-for="RememberMe" />
+        <label asp-for="RememberMe"></label>
+    </div>
+    <br />
+    <div>
+        <input type="submit" value="Увійти" class="btn btn-success" />
+    </div>
+</form>

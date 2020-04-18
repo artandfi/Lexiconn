@@ -187,3 +187,5 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Mic
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Identity.Stores.dll
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Lexiconn.MvcApplicationPartsAssemblyInfo.cache
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\SignUp.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\SignIn.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\Profile.cshtml.g.cs

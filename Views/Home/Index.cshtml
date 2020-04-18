@@ -7,101 +7,115 @@
 <div class="text-center">
     <h1 class="display-4">Lexiconn</h1>
     <p>Словник. Ваш.</p>
-    @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
-    {
-        <input type="submit" value="Додати слово" class="btn btn-primary" />
-        <input type="hidden" name="returnController" value="Home" />
-        <input type="hidden" name="returnAction" value="Index" />
-    }
 </div>
 
-<br />
-
-<table class="table" align="center">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Word)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Language)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Translation)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="text-center">
+        @using (Html.BeginForm("Create", "WordData", FormMethod.Get))
         {
-            var targetId = "#modal" + item.CatWordId;
-            var modalId = "modal" + item.CatWordId;
+            <input type="submit" value="Додати слово" class="btn btn-primary" />
+            <input type="hidden" name="returnController" value="Home" />
+            <input type="hidden" name="returnAction" value="Index" />
+        }
+    </div>
+    
+    <br />
+
+    <table class="table" align="center">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Word)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Language)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Category)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Translation)
-                </td>
-                <td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Word)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Language)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Translation)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var targetId = "#modal" + item.CatWordId;
+                var modalId = "modal" + item.CatWordId;
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Word)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Language)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Translation)
+                    </td>
+                    <td>
 
-                    <a asp-controller="WordData"
-                       asp-action="Edit"
-                       asp-route-languageId="@item.LanguageId"
-                       asp-route-wordId="@item.WordId"
-                       asp-route-word="@item.Word"
-                       asp-route-categoryId="@item.CategoryId"
-                       asp-route-catWordId="@item.CatWordId"
-                       asp-route-translation="@item.Translation"
-                       asp-route-translationIds="@item.TranslationIds"
-                       asp-route-returnController="Home"
-                       asp-route-returnAction="Index">Редагувати</a> |
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
-                        Видалити
-                    </button>
+                        <a asp-controller="WordData"
+                           asp-action="Edit"
+                           asp-route-languageId="@item.LanguageId"
+                           asp-route-wordId="@item.WordId"
+                           asp-route-word="@item.Word"
+                           asp-route-categoryId="@item.CategoryId"
+                           asp-route-catWordId="@item.CatWordId"
+                           asp-route-translation="@item.Translation"
+                           asp-route-translationIds="@item.TranslationIds"
+                           asp-route-returnController="Home"
+                           asp-route-returnAction="Index">Редагувати</a> |
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
+                            Видалити
+                        </button>
 
-                    <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Попередження</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body delete-modal-body">
-                                    Ви впевнені, що хочете видалити цей запис?
-                                </div>
-                                <div class="modal-footer">
-                                    <form asp-controller="WordData"
-                                          asp-action="Delete"
-                                          asp-route-languageId="@item.LanguageId"
-                                          asp-route-wordId="@item.WordId"
-                                          asp-route-word="@item.Word"
-                                          asp-route-categoryId="@item.CategoryId"
-                                          asp-route-catWordId="@item.CatWordId"
-                                          asp-route-translation="@item.Translation"
-                                          asp-route-translationIds="@item.TranslationIds"
-                                          asp-route-returnController="Home"
-                                          asp-route-returnAction="Index">
-                                        <button type="submit" class="btn btn-danger">Так</button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Ні</button>
-                                    </form>
+                        <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Попередження</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body delete-modal-body">
+                                        Ви впевнені, що хочете видалити цей запис?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form asp-controller="WordData"
+                                              asp-action="Delete"
+                                              asp-route-languageId="@item.LanguageId"
+                                              asp-route-wordId="@item.WordId"
+                                              asp-route-word="@item.Word"
+                                              asp-route-categoryId="@item.CategoryId"
+                                              asp-route-catWordId="@item.CatWordId"
+                                              asp-route-translation="@item.Translation"
+                                              asp-route-translationIds="@item.TranslationIds"
+                                              asp-route-returnController="Home"
+                                              asp-route-returnAction="Index">
+                                            <button type="submit" class="btn btn-danger">Так</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Ні</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="text-center">
+        <form method="get" asp-controller="Accounts" asp-action="SignUp">
+            <input type="submit" class="btn btn-success" value="Зареєструватися" />
+        </form>
+    </div>
+}

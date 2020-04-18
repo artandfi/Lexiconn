@@ -1,0 +1,38 @@
+﻿@model Lexiconn.Models.User
+
+@{
+    ViewData["Title"] = "Профіль";
+}
+
+<h1>Профіль</h1>
+<hr />
+<p style="font-size:16px">Ім'я користувача: <b>@User.Identity.Name</b></p>
+<p style="font-size:16px">Email: <b>@Html.DisplayFor(model => model.Email)</b></p>
+<p style="font-size:16px">Роль: <b>TODO</b></p>
+<p style="font-size:16px">Додано слів: @ViewBag.WordCount</p>
+<p style="font-size:16px">Усього мов: @ViewBag.LangCount</p>
+<p style="font-size:16px">Усього категорій: @ViewBag.CatCount</p>
+
+<table>
+    <tbody>
+        <tr>
+            <td>
+                <div>
+                    <form method="post">
+                        <input type="submit" class="btn btn-primary" value="Редагувати" />
+                    </form>
+                </div>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <div>
+                    <form method="post">
+                        <input type="submit" class="btn btn-danger" value="Вийти" />
+                    </form>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
