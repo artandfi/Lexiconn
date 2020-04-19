@@ -43,7 +43,7 @@ namespace Lexiconn
                 options.Password.RequiredLength = 1;
                 options.Password.RequireLowercase = false;
             }
-            ).AddEntityFrameworkStores<IdentityContext>();
+            ).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

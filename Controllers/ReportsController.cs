@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using Lexiconn.Models;
@@ -45,15 +46,17 @@ namespace Lexiconn.Controllers
 
         private readonly DBDictionaryContext _context;
         private readonly WordDataHelper _helper;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates the Reports Controller and provides it with a database context and a helper object.
         /// </summary>
         /// <param name="context">An object to interact with the database.</param>
-        public ReportsController(DBDictionaryContext context)
+        public ReportsController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
-            _helper = new WordDataHelper(context);
+            _helper = new WordDataHelper(context, accessor);
+            _user = accessor.HttpContext.User;
         }
 
         /// <summary>
@@ -148,8 +151,8 @@ namespace Lexiconn.Controllers
         /// </summary>
         private void FillSelectLists()
         {
-            ViewBag.LanguageList = new SelectList(_context.Languages, "Id", "Name");
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.LanguageList = new SelectList(_context.Languages.Where(l => l.UserName.Equals(_user.Identity.Name)), "Id", "Name");
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.UserName.Equals(_user.Identity.Name)), "Id", "Name");
         }
 
         /// <summary>
@@ -279,8 +282,8 @@ namespace Lexiconn.Controllers
         /// <param name="model">The current word record.</param>
         private bool ResolveNewLangCat(WordData model)
         {
-            var lang = _context.Languages.FirstOrDefault(l => l.Name.Equals(model.Language));
-            var cat = _context.Categories.FirstOrDefault(c => c.Name.Equals(model.Category));
+            var lang = _context.Languages.FirstOrDefault(l => l.Name.Equals(model.Language) && (l.UserName.Equals(_user.Identity.Name)));
+            var cat = _context.Categories.FirstOrDefault(c => c.Name.Equals(model.Category) && (c.UserName.Equals(_user.Identity.Name)));
 
             if (lang == null)
             {
@@ -308,7 +311,7 @@ namespace Lexiconn.Controllers
         /// <param name="model">Word record model.</param>
         private void CreateLanguage(WordData model)
         {
-            Language language = new Language() { Name = model.Language };
+            Language language = new Language() { Name = model.Language, UserName = _user.Identity.Name };
 
             _context.Languages.Add(language);
             _context.SaveChanges();
@@ -322,7 +325,7 @@ namespace Lexiconn.Controllers
         /// <param name="model">Word record model.</param>
         private void CreateCategory(WordData model)
         {
-            Category category = new Category() { Name = model.Category };
+            Category category = new Category() { Name = model.Category, UserName = _user.Identity.Name };
 
             _context.Categories.Add(category);
             _context.SaveChanges();
@@ -339,7 +342,8 @@ namespace Lexiconn.Controllers
         {
             if (criteria.LanguageId == 0)
             {
-                catWords = criteria.CategoryId == 0 ? _context.CategorizedWords.ToList() :
+                catWords = criteria.CategoryId == 0 ?
+                _context.CategorizedWords.Where(cw => cw.UserName.Equals(_user.Identity.Name)).ToList() :
                 _context.CategorizedWords.Where(cw => cw.CategoryId == criteria.CategoryId).ToList();
             }
             else

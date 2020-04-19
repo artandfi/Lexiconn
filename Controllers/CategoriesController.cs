@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,14 +11,16 @@ namespace Lexiconn.Controllers
     {
         private const string ERR_CAT_EXISTS = "Введена категорія вже додана";
         private readonly DBDictionaryContext _context;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates the Categories Controller and provides it with a database context.
         /// </summary>
         /// <param name="context">An object to interact with the database.</param>
-        public CategoriesController(DBDictionaryContext context)
+        public CategoriesController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
+            _user = accessor.HttpContext.User;
         }
 
         // GET: Categories
@@ -25,7 +29,7 @@ namespace Lexiconn.Controllers
         /// </summary>
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _context.Categories.Where(c => c.UserName.Equals(_user.Identity.Name)).ToListAsync());
         }
 
         // GET: Categories/Details/*ID*
@@ -41,7 +45,7 @@ namespace Lexiconn.Controllers
             }
 
             var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -68,7 +72,7 @@ namespace Lexiconn.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
-            bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name));
+            bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name) && (c.UserName.Equals(_user.Identity.Name)));
 
             if (duplicate)
             {
@@ -77,6 +81,7 @@ namespace Lexiconn.Controllers
 
             if (ModelState.IsValid)
             {
+                category.UserName = _user.Identity.Name;
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -152,7 +157,7 @@ namespace Lexiconn.Controllers
             }
 
             var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -171,8 +176,8 @@ namespace Lexiconn.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
+            
             _context.Categories.Remove(category);
-
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

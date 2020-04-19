@@ -18,6 +18,8 @@ namespace Lexiconn
         [StringLength(50, ErrorMessage = "Довжина має не перевищувати 50 символів")]
         public string Name { get; set; }
 
+        public string UserName { get; set; }
+
         public virtual ICollection<CategorizedWord> CategorizedWords { get; set; }
     }
 }

@@ -39,6 +39,7 @@ namespace Lexiconn
                     .IsRequired()
                     .HasColumnName("name")
                     .HasMaxLength(50);
+                entity.Property(e => e.UserName).HasColumnName("userName");
             });
 
             modelBuilder.Entity<CategorizedWord>(entity =>
@@ -48,6 +49,8 @@ namespace Lexiconn
                 entity.Property(e => e.CategoryId).HasColumnName("categoryId");
 
                 entity.Property(e => e.WordId).HasColumnName("wordId");
+
+                entity.Property(e => e.UserName).HasColumnName("userName");
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.CategorizedWords)
@@ -65,6 +68,8 @@ namespace Lexiconn
             modelBuilder.Entity<Language>(entity =>
             {
                 entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.UserName).HasColumnName("userName");
 
                 entity.Property(e => e.Name)
                     .IsRequired()

@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Lexiconn.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace Lexiconn.Supplementary
 {
     public class WordDataHelper
     {
         private readonly DBDictionaryContext _context;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates a Word Helper object to attach to the classes
         /// who need its supplementary methods.
         /// </summary>
         /// <param name="context">An object to work with the DB from the host class.</param>
-        public WordDataHelper(DBDictionaryContext context)
+        public WordDataHelper(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
+            _user = accessor.HttpContext.User;
         }
 
         /// <summary>
@@ -28,7 +32,7 @@ namespace Lexiconn.Supplementary
         public void CreateWord(WordData model, out int wordId)
         {
             var word = new Word();
-            var sameWord = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word));
+            var sameWord = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word) && w.LanguageId == model.LanguageId);
             word.LanguageId = model.LanguageId;
             word.ThisWord = model.Word;
 
@@ -56,6 +60,7 @@ namespace Lexiconn.Supplementary
             var catWord = new CategorizedWord();
             catWord.WordId = wordId;
             catWord.CategoryId = model.CategoryId;
+            catWord.UserName = _user.Identity.Name;
 
             _context.CategorizedWords.Add(catWord);
             _context.SaveChanges();

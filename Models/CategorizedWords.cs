@@ -14,6 +14,8 @@ namespace Lexiconn
         public int WordId { get; set; }
         public int CategoryId { get; set; }
 
+        public string UserName { get; set; }
+
         public virtual Category Category { get; set; }
         public virtual Word Word { get; set; }
         public virtual ICollection<Translation> Translations { get; set; }

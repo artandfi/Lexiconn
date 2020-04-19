@@ -46,13 +46,13 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Accounts" asp-action="Profile"><b>@User.Identity.Name</b></a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile"><b>@User.Identity.Name</b></a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Accounts" asp-action="SignIn">Увійти</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="SignIn">Увійти</a>
                             </li>
                         }
                     </ul>

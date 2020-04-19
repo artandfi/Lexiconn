@@ -5,20 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lexiconn.Models;
 using Lexiconn.Supplementary;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Lexiconn.Controllers
 {
     public class HomeController : Controller
     { 
         private readonly DBDictionaryContext _context;
+        private readonly IHttpContextAccessor _accessor;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates the Home Controller and provides it with a database context.
         /// </summary>
         /// <param name="context">An object to interact with the database.</param>
-        public HomeController(DBDictionaryContext context)
+        public HomeController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
+            _accessor = accessor;
+            _user = accessor.HttpContext.User;
         }
 
         /// <summary>
@@ -27,7 +33,7 @@ namespace Lexiconn.Controllers
         public async Task<IActionResult> Index()
         {
             var modelList = new List<WordData>();
-            var catWords = await _context.CategorizedWords.ToListAsync();
+            var catWords = await _context.CategorizedWords.Where(cw => cw.UserName.Equals(_user.Identity.Name)).ToListAsync();
             
             foreach (var catWord in catWords)
             {
@@ -51,7 +57,7 @@ namespace Lexiconn.Controllers
             var category = _context.Categories.Find(catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
 
-            WordDataHelper helper = new WordDataHelper(_context);
+            WordDataHelper helper = new WordDataHelper(_context, _accessor);
 
             model.Word = word.ThisWord;
             model.WordId = catWord.WordId;

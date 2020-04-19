@@ -5,6 +5,8 @@ using Lexiconn.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Lexiconn.Supplementary;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Lexiconn.Controllers
 {
@@ -15,15 +17,17 @@ namespace Lexiconn.Controllers
 
         private readonly DBDictionaryContext _context;
         private readonly WordDataHelper _helper;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates the Word Data Controller and provides it with a database context and a helper object.
         /// </summary>
         /// <param name="context">An object to interact with the database.</param>
-        public WordDataController(DBDictionaryContext context)
+        public WordDataController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
-            _helper = new WordDataHelper(context);
+            _helper = new WordDataHelper(context, accessor);
+            _user = accessor.HttpContext.User;
         }
 
         // GET: WordData/Create
@@ -37,11 +41,11 @@ namespace Lexiconn.Controllers
         /// <param name="returnAction">Name of action of the last page visited.</param>
         public IActionResult Create(int langId, string returnController, string returnAction)
         {
-            if (!_context.Languages.Any())
+            if (!_context.Languages.Any(l => l.UserName.Equals(_user.Identity.Name)))
             {
                 SetDefaultLanguages();
             }
-            if (!_context.Categories.Any())
+            if (!_context.Categories.Any(c => c.UserName.Equals(_user.Identity.Name)))
             {
                 SetDefaultCategories();
             }
@@ -49,8 +53,7 @@ namespace Lexiconn.Controllers
             FillReturnPath(returnController, returnAction);
             FillSelectLists(langId);
 
-            WordData model = new WordData();
-            return View(model);
+            return View(new WordData());
         }
 
         // POST: WordData/Create
@@ -221,10 +224,10 @@ namespace Lexiconn.Controllers
         private void FillSelectLists(int langId)
         {
             var langList = langId == 0 ?
-                new SelectList(_context.Languages, "Id", "Name") :
+                new SelectList(_context.Languages.Where(l => l.UserName.Equals(_user.Identity.Name)), "Id", "Name") :
                 new SelectList(_context.Languages.Where(l => l.Id == langId), "Id", "Name");
             ViewBag.LanguageList = langList;
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.UserName.Equals(_user.Identity.Name)), "Id", "Name");
             ViewBag.LangId = langId;
         }
 
@@ -233,11 +236,12 @@ namespace Lexiconn.Controllers
         /// </summary>
         private void SetDefaultLanguages()
         {
-            _context.Languages.Add(new Language { Name = "Англійська" });
-            _context.Languages.Add(new Language { Name = "Російська" });
-            _context.Languages.Add(new Language { Name = "Німецька" });
-            _context.Languages.Add(new Language { Name = "Іспанська" });
-            _context.Languages.Add(new Language { Name = "Французька" });
+            _context.Languages.Add(new Language { Name = "Англійська", UserName = _user.Identity.Name }) ;
+            _context.Languages.Add(new Language { Name = "Російська", UserName = _user.Identity.Name });
+            _context.Languages.Add(new Language { Name = "Німецька", UserName = _user.Identity.Name });
+            _context.Languages.Add(new Language { Name = "Іспанська", UserName = _user.Identity.Name });
+            _context.Languages.Add(new Language { Name = "Французька", UserName = _user.Identity.Name });
+            _context.SaveChanges();
         }
 
         /// <summary>
@@ -245,17 +249,17 @@ namespace Lexiconn.Controllers
         /// </summary>
         private void SetDefaultCategories()
         {
-            _context.Categories.Add(new Category { Name = "Іменник" });
-            _context.Categories.Add(new Category { Name = "Прикметник" });
-            _context.Categories.Add(new Category { Name = "Числівник" });
-            _context.Categories.Add(new Category { Name = "Займенник" });
-            _context.Categories.Add(new Category { Name = "Дієслово" });
-            _context.Categories.Add(new Category { Name = "Прислівник" });
-            _context.Categories.Add(new Category { Name = "Сполучник" });
-            _context.Categories.Add(new Category { Name = "Прийменник" });
-            _context.Categories.Add(new Category { Name = "Частка" });
-            _context.Categories.Add(new Category { Name = "Вигук" });
-            _context.Categories.Add(new Category { Name = "Модальник" });
+            _context.Categories.Add(new Category { Name = "Іменник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Прикметник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Числівник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Займенник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Дієслово", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Прислівник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Сполучник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Прийменник", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Частка", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Вигук", UserName = _user.Identity.Name });
+            _context.Categories.Add(new Category { Name = "Модальник", UserName = _user.Identity.Name });
             _context.SaveChanges();
         }
     }

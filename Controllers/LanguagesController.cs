@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lexiconn.Models;
 using Lexiconn.Supplementary;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Lexiconn.Controllers
 {
@@ -12,14 +14,18 @@ namespace Lexiconn.Controllers
     {
         private const string ERR_LANG_EXISTS = "Введена мова вже додана";
         private readonly DBDictionaryContext _context;
+        private readonly IHttpContextAccessor _accessor;
+        private readonly ClaimsPrincipal _user;
 
         /// <summary>
         /// Creates the Languages Controller and provides it with a database context.
         /// </summary>
         /// <param name="context">An object to interact with the database.</param>
-        public LanguagesController(DBDictionaryContext context)
+        public LanguagesController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
+            _accessor = accessor;
+            _user = accessor.HttpContext.User;
         }
 
         // GET: Languages
@@ -28,7 +34,7 @@ namespace Lexiconn.Controllers
         /// </summary>
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Languages.ToListAsync());
+            return View(await _context.Languages.Where(l => l.UserName.Equals(_user.Identity.Name)).ToListAsync());
         }
 
         // GET: Languages/Details/*ID*
@@ -71,7 +77,7 @@ namespace Lexiconn.Controllers
         {
             var category = _context.Categories.Find(catWord.CategoryId);
             var translations = _context.Translations.Where(t => t.CategorizedWordId == catWord.Id).ToList();
-            var helper = new WordDataHelper(_context);
+            var helper = new WordDataHelper(_context, _accessor);
 
             model.WordId = catWord.WordId;
             model.Word = words.Find(w => w.Id == catWord.WordId).ThisWord;
@@ -102,7 +108,7 @@ namespace Lexiconn.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Language language)
         {
-            bool duplicate = await _context.Languages.AnyAsync(l => l.Name.Equals(language.Name));
+            bool duplicate = await _context.Languages.AnyAsync(l => l.Name.Equals(language.Name) && (l.UserName.Equals(_user.Identity.Name)));
 
             if (duplicate)
             {
@@ -111,6 +117,7 @@ namespace Lexiconn.Controllers
 
             if (ModelState.IsValid)
             {
+                language.UserName = _user.Identity.Name;
                 _context.Add(language);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -185,14 +192,14 @@ namespace Lexiconn.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var language = await _context.Languages
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (language == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(language);
         }
 
         // POST: Categories/Delete/*ID*
