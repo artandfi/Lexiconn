@@ -17,6 +17,7 @@ namespace Lexiconn.Controllers
     {
         private const string ERR_DUPL_EMAIL = "Користувач із такою адресою вже існує";
         private const string ERR_DUPL_USERNAME = "Користувач з таким ім\'ям вже існує";
+        private const string ERR_LGN_PWD = "Неправильний логін або пароль";
         private const string ERR_OLD_PWD = "Неправильний пароль";
         private const string ERR_UNCONFIRMED = "Ви не підтвердили свій Email";
         private const string SUBJ_CONFIRM = "Підтвердження";
@@ -41,7 +42,7 @@ namespace Lexiconn.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             string roleList = string.Join(", ", roles);
 
-            ViewBag.Roles = roles.Count > 1 ? roleList.Remove(roleList.Length - 1) : roleList;
+            ViewBag.Roles = roleList;
             ViewBag.WordCount = _context.CategorizedWords.Where(cw => cw.UserName.Equals(User.Identity.Name)).Count();
             ViewBag.LangCount = _context.Languages.Where(cw => cw.UserName.Equals(User.Identity.Name) || cw.UserName == null).Count();
             ViewBag.CatCount = _context.Categories.Where(cw => cw.UserName.Equals(User.Identity.Name) || cw.UserName == null).Count();
@@ -131,6 +132,11 @@ namespace Lexiconn.Controllers
                         return View(model);
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError("UserName", ERR_LGN_PWD);
+                    return View(model);
+                }
 
                 if (!user.UserName.Equals("admin"))
                 {
@@ -152,7 +158,7 @@ namespace Lexiconn.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("Password", "Некоректний логін або пароль");
+                    ModelState.AddModelError("Password", ERR_LGN_PWD);
                 }
             }
             return View(model);

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lexiconn.Models;
 using Lexiconn.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lexiconn.Controllers
 {
-
+    [Authorize(Roles = "admin")]
     public class RolesController : Controller
     {
         private const string ERR_DUPL_ROLE = "Така роль вже існує";

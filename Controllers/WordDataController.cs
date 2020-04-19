@@ -41,15 +41,6 @@ namespace Lexiconn.Controllers
         /// <param name="returnAction">Name of action of the last page visited.</param>
         public IActionResult Create(int langId, string returnController, string returnAction)
         {
-            if (!_context.Languages.Any(l => l.UserName.Equals(_user.Identity.Name)))
-            {
-                SetDefaultLanguages();
-            }
-            if (!_context.Categories.Any(c => c.UserName.Equals(_user.Identity.Name)))
-            {
-                SetDefaultCategories();
-            }
-
             FillReturnPath(returnController, returnAction);
             FillSelectLists(langId);
 
@@ -229,38 +220,6 @@ namespace Lexiconn.Controllers
             ViewBag.LanguageList = langList;
             ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.UserName.Equals(_user.Identity.Name)), "Id", "Name");
             ViewBag.LangId = langId;
-        }
-
-        /// <summary>
-        /// Sets the default languages when there is no languages.
-        /// </summary>
-        private void SetDefaultLanguages()
-        {
-            _context.Languages.Add(new Language { Name = "Англійська", UserName = _user.Identity.Name }) ;
-            _context.Languages.Add(new Language { Name = "Російська", UserName = _user.Identity.Name });
-            _context.Languages.Add(new Language { Name = "Німецька", UserName = _user.Identity.Name });
-            _context.Languages.Add(new Language { Name = "Іспанська", UserName = _user.Identity.Name });
-            _context.Languages.Add(new Language { Name = "Французька", UserName = _user.Identity.Name });
-            _context.SaveChanges();
-        }
-
-        /// <summary>
-        /// Sets the default categories when there is no categories.
-        /// </summary>
-        private void SetDefaultCategories()
-        {
-            _context.Categories.Add(new Category { Name = "Іменник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Прикметник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Числівник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Займенник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Дієслово", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Прислівник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Сполучник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Прийменник", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Частка", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Вигук", UserName = _user.Identity.Name });
-            _context.Categories.Add(new Category { Name = "Модальник", UserName = _user.Identity.Name });
-            _context.SaveChanges();
         }
     }
 }
