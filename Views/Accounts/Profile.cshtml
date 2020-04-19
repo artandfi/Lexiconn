@@ -1,4 +1,5 @@
-﻿@model Lexiconn.Models.User
+﻿@using Microsoft.AspNetCore.Identity
+@model Lexiconn.Models.User
 
 @{
     ViewData["Title"] = "Профіль";
@@ -8,7 +9,7 @@
 <hr />
 <p style="font-size:16px">Ім'я користувача: <b>@User.Identity.Name</b></p>
 <p style="font-size:16px">Email: <b>@Html.DisplayFor(model => model.Email)</b></p>
-<p style="font-size:16px">Роль: <b>TODO</b></p>
+<p style="font-size:16px">Ролі: <b>@ViewBag.Roles</b></p>
 <p style="font-size:16px">Додано слів: @ViewBag.WordCount</p>
 <p style="font-size:16px">Усього мов: @ViewBag.LangCount</p>
 <p style="font-size:16px">Усього категорій: @ViewBag.CatCount</p>
@@ -18,9 +19,7 @@
         <tr>
             <td>
                 <div>
-                    <form method="post">
-                        <input type="submit" class="btn btn-primary" value="Редагувати" />
-                    </form>
+                    <a class="btn btn-warning" asp-action="ChangePassword">Змінити пароль</a>
                 </div>
             </td>
             <td>
@@ -28,11 +27,37 @@
             </td>
             <td>
                 <div>
-                    <form method="post" asp-action="SignOut">
-                        <input type="submit" class="btn btn-danger" value="Вийти" />
-                    </form>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirm">
+                        Вийти
+                    </button>
+                </div>
+
+                <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Попередження</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body delete-modal-body">
+                                Ви впевнені, що хочете вийти?
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post" asp-action="SignOut">
+                                    <button type="submit" class="btn btn-danger">Так</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Ні</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
     </tbody>
 </table>
+<br />
+<a>
+    @Html.ActionLink("На головну", "Index", "Home")
+</a>

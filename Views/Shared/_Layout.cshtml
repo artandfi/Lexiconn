@@ -31,6 +31,15 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">Звіти</a>
                             </li>
                         }
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Користувачі</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Ролі</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Help" asp-action="Index">Довідка</a>
                         </li>

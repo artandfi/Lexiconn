@@ -7,6 +7,9 @@
 <h1>Ролі</h1>
 <hr />
 
+<p>
+    <a asp-action="Create">Додати нову</a>
+</p>
 <table class="table">
     @foreach (var role in Model)
     {
@@ -15,9 +18,16 @@
         <tr>
             <td>@role.Name</td>
             <td>
-                <button type="submit" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
-                    Видалити
-                </button>
+                @if (role.Name.Equals("user") || role.Name.Equals("admin"))
+                {
+                    <div>Базова роль</div>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-danger" data-toggle="modal" data-target="@targetId">
+                        Видалити
+                    </button>
+                }
 
                 <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -44,4 +54,3 @@
         </tr>
     }
 </table>
-<a asp-action="UserList">Список користувачів</a>

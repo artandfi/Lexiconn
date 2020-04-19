@@ -190,4 +190,6 @@ D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Raz
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\SignIn.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\Profile.cshtml.g.cs
 D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Roles\Index.cshtml.g.cs
-D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Roles\UserList.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Users\Edit.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Users\Index.cshtml.g.cs
+D:\Женя\Projects\C# Projects\Dictionary\Lexiconn\obj\Debug\netcoreapp3.1\Razor\Views\Accounts\ChangePassword.cshtml.g.cs
