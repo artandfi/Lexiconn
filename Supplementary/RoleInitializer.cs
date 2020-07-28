@@ -19,10 +19,12 @@ namespace LibraryMVC
             {
                 await roleManager.CreateAsync(new IdentityRole("user"));
             }
+
             if (await userManager.FindByEmailAsync(_adminEmail) == null)
             {
                 User admin = new User { Email = _adminEmail, UserName = "admin" };
                 IdentityResult result = await userManager.CreateAsync(admin, _password);
+
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, "admin");

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lexiconn.Models;
@@ -26,7 +25,8 @@ namespace Lexiconn.Controllers
 
         public async Task<IActionResult> Edit(string userId)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
+            
             if (user != null)
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -43,10 +43,12 @@ namespace Lexiconn.Controllers
 
             return NotFound();
         }
+
         [HttpPost]
         public async Task<IActionResult> Edit(string userId, List<string> roles)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
+            
             if (user != null)
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -65,11 +67,13 @@ namespace Lexiconn.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(string userId)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
+            
             if (user != null)
             {
                 await _userManager.DeleteAsync(user);
             }
+            
             return RedirectToAction("Index");
         }
     }

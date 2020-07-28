@@ -113,11 +113,18 @@
 }
 else
 {
-    <div class="text-center">
-        <form method="get" asp-controller="Account" asp-action="SignUp">
-            <input type="submit" class="btn btn-success" value="Зареєструватися" />
-        </form>
-    </div>
+<div class="text-center">
+    <form method="get" asp-controller="Account" asp-action="SignUp">
+        <p align="center">
+            <input type="submit" class="btn btn-success" style="width:200px" value="Зареєструватися" />
+        </p>
+    </form>
+    <form method="get" asp-controller="Account" asp-action="SignIn">
+        <p align="center">
+            <input type="submit" class="btn btn-primary" style="width:200px" value="Увійти" />
+        </p>
+    </form>
+</div>
 }
 
 <div class="modal fade" id="messagePopup" tabindex="-1" role="alertdialog" aria-hidden="true">

@@ -22,7 +22,5 @@ namespace Lexiconn.ViewModels
 
         [Display(Name = "Запам\'ятати мене")]
         public bool RememberMe { get; set; }
-
-        public string ReturnUrl { get; set; }
     }
 }

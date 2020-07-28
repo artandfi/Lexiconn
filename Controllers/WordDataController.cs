@@ -19,10 +19,6 @@ namespace Lexiconn.Controllers
         private readonly WordDataHelper _helper;
         private readonly ClaimsPrincipal _user;
 
-        /// <summary>
-        /// Creates the Word Data Controller and provides it with a database context and a helper object.
-        /// </summary>
-        /// <param name="context">An object to interact with the database.</param>
         public WordDataController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
@@ -30,15 +26,6 @@ namespace Lexiconn.Controllers
             _user = accessor.HttpContext.User;
         }
 
-        // GET: WordData/Create
-        /// <summary>
-        /// Returns a view for creating a new word record,
-        /// setting default categories and languages if ones absent.
-        /// </summary>
-        /// <param name="langId">Language's ID needed to know if adding words from a certain language's page.
-        /// Equals to zero if creating from the home page.</param>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         public IActionResult Create(int langId, string returnController, string returnAction)
         {
             FillReturnPath(returnController, returnAction);
@@ -47,14 +34,6 @@ namespace Lexiconn.Controllers
             return View(new WordData());
         }
 
-        // POST: WordData/Create
-        /// <summary>
-        /// Adds a new word record to the database and redirects back here to maybe add another record if input valid.
-        /// Displays the error if it isn't.
-        /// </summary>
-        /// <param name="model">The word record to add.</param>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(WordData model, string returnController, string returnAction)
@@ -86,13 +65,6 @@ namespace Lexiconn.Controllers
             return View(model);
         }
 
-        // GET: WordData/Edit
-        /// <summary>
-        /// Returns a view for editing an existing word record.
-        /// </summary>
-        /// <param name="model">The word record to edit.</param>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         public IActionResult Edit(WordData model, string returnController, string returnAction)
         {
             ViewBag.LangId = model.LanguageId;
@@ -101,14 +73,6 @@ namespace Lexiconn.Controllers
             return View(model);
         }
 
-        // POST: WordData/EditConfirmed
-        /// <summary>
-        /// Edits the record specified if new input valid.
-        /// Displays the error if it isn't.
-        /// </summary>
-        /// <param name="model">The word record to edit.</param>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public IActionResult EditConfirmed(WordData model, string returnController, string returnAction)
@@ -137,13 +101,6 @@ namespace Lexiconn.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Removes the specified word record from the database,
-        /// leaving ther word if there are more than one category for it and deleting it otherwise.
-        /// </summary>
-        /// <param name="model">The word record to remove.</param>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         public IActionResult Delete(WordData model, string returnController, string returnAction)
         {
             var wordEntity = _context.Words.First(w => w.ThisWord.Equals(model.Word) && w.LanguageId == model.LanguageId);
@@ -165,11 +122,6 @@ namespace Lexiconn.Controllers
             return RedirectToAction(returnAction, returnController, new { langId = model.LanguageId });
         }
 
-        /// <summary>
-        /// Determines whether the word record duplicates already existing one.
-        /// Two records are considered duplicates if their words, languages and categories match.
-        /// </summary>
-        /// <param name="model">The word record to check.</param>
         private bool IsDuplicate(WordData model)
         {
             var word = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word)
@@ -183,7 +135,7 @@ namespace Lexiconn.Controllers
         {
             var word = _context.Words.FirstOrDefault(w => w.ThisWord.Equals(model.Word)
             && w.LanguageId == model.LanguageId);
-            
+
             if (word == null)
             {
                 return false;
@@ -192,26 +144,15 @@ namespace Lexiconn.Controllers
             var catWord = _context.CategorizedWords.FirstOrDefault(cw => cw.WordId == word.Id
             && cw.CategoryId == model.CategoryId);
 
-            return catWord.Id != model.CatWordId;
+            return catWord != null && catWord.Id != model.CatWordId;
         }
 
-        /// <summary>
-        /// Specifies the return path for redirects.
-        /// </summary>
-        /// <param name="returnController">Name of the controller of the last page visited.</param>
-        /// <param name="returnAction">Name of action of the last page visited.</param>
         private void FillReturnPath(string returnController, string returnAction)
         {
             ViewBag.ReturnController = returnController;
             ViewBag.ReturnAction = returnAction;
         }
 
-        /// <summary>
-        /// Provides the dropdown lists for languages and categories.
-        /// If there was a language chosen to create a word record in (id is non-zero),
-        /// then only this language is added to list to display.
-        /// </summary>
-        /// <param name="langId">Zero if there was no language chosen, its ID otherwise.</param>
         private void FillSelectLists(int langId)
         {
             var langList = langId == 0 ?

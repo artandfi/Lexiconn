@@ -11,7 +11,7 @@ namespace Lexiconn.Supplementary
     {
         private const string TITLE_ADMIN = "Адміністрація Lexiconn";
         private const string MAIL_ADMIN = "misdispel@gmail.com";
-        private const string PWD_ADMIN = "*************";
+        private const string PWD_ADMIN = "dummy";
         private const string SMTP_SERVER = "smtp.gmail.com";
         private const int SMTP_PORT = 465;
 

@@ -48,10 +48,6 @@ namespace Lexiconn.Controllers
         private readonly WordDataHelper _helper;
         private readonly ClaimsPrincipal _user;
 
-        /// <summary>
-        /// Creates the Reports Controller and provides it with a database context and a helper object.
-        /// </summary>
-        /// <param name="context">An object to interact with the database.</param>
         public ReportsController(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
@@ -59,11 +55,6 @@ namespace Lexiconn.Controllers
             _user = accessor.HttpContext.User;
         }
 
-        /// <summary>
-        /// Displays a view with import/export controls.
-        /// </summary>
-        /// <param name="errorFlag">A flag to define whether the report was erronous./param>
-        /// <param name="error">The error occured.</param>
         public IActionResult Index(bool errorFlag, string error)
         {
             if (!errorFlag)
@@ -82,11 +73,6 @@ namespace Lexiconn.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Analyzes the file provided, adds the report info to the DB if file valid,
-        /// redirects back to controls if one faulty with error info provided.
-        /// </summary>
-        /// <param name="fileExcel">The report file submitted by user.</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Import(IFormFile fileExcel)
@@ -112,11 +98,6 @@ namespace Lexiconn.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        /// <summary>
-        /// Exports the records upon the specified criteria if ones exist,
-        /// redirects back to controls with error message provided otherwise.
-        /// </summary>
-        /// <param name="criteria">The filtering criteria specified.</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Export(WordData criteria)
@@ -146,20 +127,12 @@ namespace Lexiconn.Controllers
             }
         }
 
-        /// <summary>
-        /// Provides the dropdown lists for languages and categories filtering for export.
-        /// </summary>
         private void FillSelectLists()
         {
             ViewBag.LanguageList = new SelectList(_context.Languages.Where(l => l.UserName.Equals(_user.Identity.Name)), "Id", "Name");
             ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.UserName.Equals(_user.Identity.Name)), "Id", "Name");
         }
 
-        /// <summary>
-        /// Parses the report's workbook. Gives away info about record error if one present.
-        /// </summary>
-        /// <param name="workbook">The report's workbook.</param>
-        /// <param name="error">Error info to give away.</param>
         private bool ParseReport(XLWorkbook workbook, out string error)
         {
             error = "";
@@ -176,19 +149,13 @@ namespace Lexiconn.Controllers
             return true;
         }
 
-        /// <summary>
-        /// Parses the current row of a current worksheet.
-        /// Gives away info about record error if one present.
-        /// </summary>
-        /// <param name="row">Current row of a current worksheet.</param>
-        /// <param name="error">Error info to give away.</param>
         private bool ParseRow(IXLRow row, out string error)
         {
-            string word = row.Cell(WORD_IND).Value.ToString();
-            string lang = row.Cell(LANG_IND).Value.ToString();
-            string cat = row.Cell(CAT_IND).Value.ToString();
-            string translation = row.Cell(TRAN_IND).Value.ToString();
-            WordData model = new WordData { Word = word, Language = lang, Category = cat, Translation = translation };
+            var word = row.Cell(WORD_IND).Value.ToString();
+            var lang = row.Cell(LANG_IND).Value.ToString();
+            var cat = row.Cell(CAT_IND).Value.ToString();
+            var translation = row.Cell(TRAN_IND).Value.ToString();
+            var model = new WordData { Word = word, Language = lang, Category = cat, Translation = translation };
 
             if (IsRowErronous(model, out error))
             {
@@ -209,12 +176,6 @@ namespace Lexiconn.Controllers
             return true;
         }
 
-        /// <summary>
-        /// Determines whether a row contains erronous record.
-        /// </summary>
-        /// <param name="model">Word record model.</param>
-        /// <param name="error"></param>
-        /// <returns></returns>
         private bool IsRowErronous(WordData model, out string error)
         {
             error = "";
@@ -242,10 +203,6 @@ namespace Lexiconn.Controllers
             return false;
         }
 
-        /// <summary>
-        /// Self-explanatory. :)
-        /// </summary>
-        /// <param name="model">Word record model.</param>
         private void CreateNewLangAndCatIfNeeded(WordData model)
         {
             if (model.LanguageId == 0)
@@ -258,10 +215,6 @@ namespace Lexiconn.Controllers
             }
         }
 
-        /// <summary>
-        /// Determines whether a current record is duplicating the existing one.
-        /// </summary>
-        /// <param name="model">The current word record.</param>
         private bool IsDuplicate(WordData model)
         {
             if (!ResolveNewLangCat(model))
@@ -276,10 +229,6 @@ namespace Lexiconn.Controllers
             && cw.CategoryId == model.CategoryId);
         }
 
-        /// <summary>
-        /// Resolves the presence of language and category in the DB.
-        /// </summary>
-        /// <param name="model">The current word record.</param>
         private bool ResolveNewLangCat(WordData model)
         {
             var lang = _context.Languages.FirstOrDefault(l => l.Name.Equals(model.Language) && (l.UserName.Equals(_user.Identity.Name)));
@@ -305,13 +254,9 @@ namespace Lexiconn.Controllers
             return true;
         }
 
-        /// <summary>
-        /// Self-explanatory. :)
-        /// </summary>
-        /// <param name="model">Word record model.</param>
         private void CreateLanguage(WordData model)
         {
-            Language language = new Language() { Name = model.Language, UserName = _user.Identity.Name };
+            var language = new Language() { Name = model.Language, UserName = _user.Identity.Name };
 
             _context.Languages.Add(language);
             _context.SaveChanges();
@@ -319,13 +264,9 @@ namespace Lexiconn.Controllers
             model.LanguageId = language.Id;
         }
 
-        /// <summary>
-        /// Self-explanatory. :)
-        /// </summary>
-        /// <param name="model">Word record model.</param>
         private void CreateCategory(WordData model)
         {
-            Category category = new Category() { Name = model.Category, UserName = _user.Identity.Name };
+            var category = new Category() { Name = model.Category, UserName = _user.Identity.Name };
 
             _context.Categories.Add(category);
             _context.SaveChanges();
@@ -333,11 +274,6 @@ namespace Lexiconn.Controllers
             model.CategoryId = category.Id;
         }
 
-        /// <summary>
-        /// Forms the categorized words list based upon the specified criteria.
-        /// </summary>
-        /// <param name="criteria">The criteria specified.</param>
-        /// <param name="catWords">The categorized words list to give away.</param>
         private void FormCatWordsToExport(WordData criteria, ref List<CategorizedWord> catWords)
         {
             if (criteria.LanguageId == 0)
@@ -366,11 +302,6 @@ namespace Lexiconn.Controllers
             }
         }
 
-        /// <summary>
-        /// Fills the worksheet of the report file with all the selected records.
-        /// </summary>
-        /// <param name="worksheet">The worksheet of the report.</param>
-        /// <param name="catWords">The categorized words (defining records) list.</param>
         private void FillWorksheet(IXLWorksheet worksheet, List<CategorizedWord> catWords)
         {
             worksheet.Cell(WORD_CELL).Value = WORD;

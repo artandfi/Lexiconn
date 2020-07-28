@@ -12,23 +12,12 @@ namespace Lexiconn.Supplementary
         private readonly DBDictionaryContext _context;
         private readonly ClaimsPrincipal _user;
 
-        /// <summary>
-        /// Creates a Word Helper object to attach to the classes
-        /// who need its supplementary methods.
-        /// </summary>
-        /// <param name="context">An object to work with the DB from the host class.</param>
         public WordDataHelper(DBDictionaryContext context, IHttpContextAccessor accessor)
         {
             _context = context;
             _user = accessor.HttpContext.User;
         }
 
-        /// <summary>
-        /// Creates a new word in the corresponding table if it isn't present there yet,
-        /// gives away the existing one's ID otherwise, for the specified ford record.
-        /// </summary>
-        /// <param name="model">The word record to add to the database.</param>
-        /// <param name="wordId">The word's future or actual ID.</param>
         public void CreateWord(WordData model, out int wordId)
         {
             var word = new Word();
@@ -48,33 +37,20 @@ namespace Lexiconn.Supplementary
             }
         }
 
-        /// <summary>
-        /// Adds a new categorized word in the corresponding table,
-        /// giving away its ID, for the specified word record.
-        /// </summary>
-        /// <param name="model">The word record to add to the database.</param>
-        /// <param name="wordId">The added word's ID.</param>
-        /// <param name="catWordId">The categorized word's ID to give away.</param>
         public void CreateCatWord(WordData model, int wordId, out int catWordId)
         {
-            var catWord = new CategorizedWord();
-            catWord.WordId = wordId;
-            catWord.CategoryId = model.CategoryId;
-            catWord.UserName = _user.Identity.Name;
+            var catWord = new CategorizedWord
+            {
+                WordId = wordId,
+                CategoryId = model.CategoryId,
+                UserName = _user.Identity.Name
+            };
 
             _context.CategorizedWords.Add(catWord);
             _context.SaveChanges();
             catWordId = catWord.Id;
         }
 
-        /// <summary>
-        /// Adds new translations to the corresponding table,
-        /// giving away a possibly occured input format error flag,
-        /// for the specified word record.
-        /// </summary>
-        /// <param name="model">The word record to add to the database.</param>
-        /// <param name="catWordId">The added categorized word's ID.</param>
-        /// <param name="error">The error flag to give away.</param>
         public void CreateTranslations(WordData model, int catWordId, out bool error)
         {
             error = false;
@@ -95,10 +71,6 @@ namespace Lexiconn.Supplementary
             _context.SaveChanges();
         }
 
-        /// <summary>
-        /// Updates the word and its language for the specified word record.
-        /// </summary>
-        /// <param name="model">The word record to update.</param>
         public void UpdateWord(WordData model)
         {
             var wordEntity = _context.Words.First(w => w.Id == model.WordId);
@@ -108,10 +80,6 @@ namespace Lexiconn.Supplementary
             _context.SaveChanges();
         }
 
-        /// <summary>
-        /// Updates the categorized word's category for the specified word record.
-        /// </summary>
-        /// <param name="model">The word record to update.</param>
         public void UpdateCatWord(WordData model)
         {
             var catWordEntity = _context.CategorizedWords.First(cw => cw.Id == model.CatWordId);
@@ -121,10 +89,6 @@ namespace Lexiconn.Supplementary
             _context.SaveChanges();
         }
 
-        /// <summary>
-        /// Updates translations for the specified word record.
-        /// </summary>
-        /// <param name="model">The word record to update.</param>
         public bool UpdateTranslations(WordData model)
         {
             var oldTranslationIds = model.TranslationIds.Split(',').Select(Int32.Parse).ToList();
@@ -154,11 +118,6 @@ namespace Lexiconn.Supplementary
             return true;
         }
 
-        /// <summary>
-        /// Turns string-listed translations into a list of translations object.
-        /// </summary>
-        /// <param name="raw">The string-listed translations.</param>
-        /// <param name="translations">List of translations object to fill in and give away.</param>
         public bool SplitTranslations(string raw, ref List<Translation> translations)
         {
             string curTranslation = "";
@@ -187,26 +146,12 @@ namespace Lexiconn.Supplementary
             return true;
         }
 
-        /// <summary>
-        /// Determines whether a first character input is correct,
-        /// i.e. whether it's not a comma or a whitespace. 
-        /// </summary>
-        /// <param name="cur">Current character read.</param>
-        /// <param name="curTranslation">Current translation read.</param>
         private bool IsFirstCharacterCorrect(char cur, ref string curTranslation)
         {
             curTranslation += cur;
             return cur != ',' && cur != ' ';
         }
 
-        /// <summary>
-        /// Defines the correctness of all further characters and forges them into translations
-        /// as they appear and if they are correct.
-        /// </summary>
-        /// <param name="prev">Previous character read.</param>
-        /// <param name="cur">Current character read.</param>
-        /// <param name="curTranslation">Current translation read.</param>
-        /// <param name="translations">Translations' list to give away.</param>
         private bool ResolveCharacters(char prev, char cur, ref string curTranslation, ref List<Translation> translations)
         {
             if (cur == ',')
@@ -229,14 +174,6 @@ namespace Lexiconn.Supplementary
             return true;
         }
 
-        /// <summary>
-        /// Resolves translations' update type:
-        /// - if their amount increased, the existing are updated and the oncome added;
-        /// - if their amount didn't change, they are updated;
-        /// - if their amount decreased, the remaining are updated and the extra are removed.
-        /// </summary>
-        /// <param name="oldTs"></param>
-        /// <param name="newTs"></param>
         private void ResolveTranslationUpdate(List<Translation> oldTs, List<Translation> newTs)
         {
             if (oldTs.Count < newTs.Count)
@@ -265,12 +202,6 @@ namespace Lexiconn.Supplementary
             _context.SaveChanges();
         }
 
-        /// <summary>
-        /// Determines whether an extra comma error was encountered during reading translations.
-        /// If so, the creation of new word record is rolled back.
-        /// </summary>
-        /// <param name="commaError">A flag of extra comma error.</param>
-        /// <param name="wordId">The ID of recently added word to delete.</param>
         public bool ValidateComma(bool commaError, int wordId)
         {
             if (commaError)
@@ -287,10 +218,6 @@ namespace Lexiconn.Supplementary
             }
         }
 
-        /// <summary>
-        /// Transforms the given list of translation IDs into string (with commas).
-        /// </summary>
-        /// <param name="translations">List of the translations whose IDs need to be set.</param>
         public string TranslationIdsToString(List<Translation> translations)
         {
             var translationIds = new List<int>();
@@ -302,10 +229,6 @@ namespace Lexiconn.Supplementary
             return string.Join(",", translationIds);
         }
 
-        /// <summary>
-        /// Transforms the given translations list into string (with commas).
-        /// </summary>
-        /// <param name="translations">Translations list to be transformed.</param>
         public string TranslationsToString(List<Translation> translations)
         {
             string commaTranslations = "";
