@@ -16,6 +16,7 @@ namespace Lexiconn.Controllers
 {
     public class ReportsController : Controller
     {
+        #region constants
         private const int WORD_IND = 1;
         private const int LANG_IND = 2;
         private const int CAT_IND  = 3;
@@ -43,6 +44,7 @@ namespace Lexiconn.Controllers
         private const string ERR_TRAN = "Переклади наведено в некоректному форматі";
         private const string ERR_END = ". Будь ласка, спробуйте ще раз.";
         private const string ERR_EXP_NIX = "Записи за вказаними фільтрами відсутні. Завантаження звіту відхилено.";
+        #endregion
 
         private readonly DBDictionaryContext _context;
         private readonly WordDataHelper _helper;
@@ -55,9 +57,9 @@ namespace Lexiconn.Controllers
             _user = accessor.HttpContext.User;
         }
 
-        public IActionResult Index(bool errorFlag, string error)
+        public IActionResult Index(string error)
         {
-            if (!errorFlag)
+            if (string.IsNullOrEmpty(error))
             {
                 ViewBag.Error = ERR_EXT;
             }
@@ -67,10 +69,8 @@ namespace Lexiconn.Controllers
                 ViewBag.ErrorPopupFlag = 1;
             }
 
-            WordData model = new WordData();
-
             FillSelectLists();
-            return View(model);
+            return View(new WordData());
         }
 
         [HttpPost]
@@ -86,16 +86,16 @@ namespace Lexiconn.Controllers
                     {
                         if (!ParseReport(workbook, out string error))
                         {
-                            return RedirectToAction("Index", new { errorFlag = true, error = error });
+                            return RedirectToAction("Index", new { error = error });
                         }
                     }
                 }
+                return RedirectToAction("Index", "Home");
             }
             else
             {
-                return RedirectToAction("Index", new { errorFlag = true, error = ERR_FILE_NULL + ERR_END });
+                return RedirectToAction("Index", new { error = ERR_FILE_NULL + ERR_END });
             }
-            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -111,7 +111,7 @@ namespace Lexiconn.Controllers
 
                 if (catWords.Count == 0)
                 {
-                    return RedirectToAction("Index", new { errorFlag = true, error = ERR_EXP_NIX });
+                    return RedirectToAction("Index", new { error = ERR_EXP_NIX });
                 }
 
                 FillWorksheet(worksheet, catWords);
@@ -122,7 +122,7 @@ namespace Lexiconn.Controllers
                     await stream.FlushAsync();
 
                     return new FileContentResult(stream.ToArray(), REPORT_FORMAT)
-                    { FileDownloadName = $"Lexiconn {DateTime.Now.ToString()}.xlsx"};
+                    { FileDownloadName = $"Lexiconn { DateTime.Now.ToString()}.xlsx" };
                 }
             }
         }
@@ -257,20 +257,16 @@ namespace Lexiconn.Controllers
         private void CreateLanguage(WordData model)
         {
             var language = new Language() { Name = model.Language, UserName = _user.Identity.Name };
-
             _context.Languages.Add(language);
             _context.SaveChanges();
-
             model.LanguageId = language.Id;
         }
 
         private void CreateCategory(WordData model)
         {
             var category = new Category() { Name = model.Category, UserName = _user.Identity.Name };
-
             _context.Categories.Add(category);
             _context.SaveChanges();
-
             model.CategoryId = category.Id;
         }
 

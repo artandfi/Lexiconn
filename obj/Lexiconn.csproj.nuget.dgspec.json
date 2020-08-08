@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Женя\\Projects\\C# Projects\\Dictionary\\Lexiconn\\Lexiconn.csproj": {}
+    "D:\\Женя\\Projects\\C# Projects\\Lexiconn Dictionary\\Lexiconn.csproj": {}
   },
   "projects": {
-    "D:\\Женя\\Projects\\C# Projects\\Dictionary\\Lexiconn\\Lexiconn.csproj": {
+    "D:\\Женя\\Projects\\C# Projects\\Lexiconn Dictionary\\Lexiconn.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Женя\\Projects\\C# Projects\\Dictionary\\Lexiconn\\Lexiconn.csproj",
+        "projectUniqueName": "D:\\Женя\\Projects\\C# Projects\\Lexiconn Dictionary\\Lexiconn.csproj",
         "projectName": "Lexiconn",
-        "projectPath": "D:\\Женя\\Projects\\C# Projects\\Dictionary\\Lexiconn\\Lexiconn.csproj",
+        "projectPath": "D:\\Женя\\Projects\\C# Projects\\Lexiconn Dictionary\\Lexiconn.csproj",
         "packagesPath": "C:\\Users\\Artyom\\.nuget\\packages\\",
-        "outputPath": "D:\\Женя\\Projects\\C# Projects\\Dictionary\\Lexiconn\\obj\\",
+        "outputPath": "D:\\Женя\\Projects\\C# Projects\\Lexiconn Dictionary\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

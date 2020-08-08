@@ -30,7 +30,6 @@ namespace Lexiconn.Controllers
         {
             FillReturnPath(returnController, returnAction);
             FillSelectLists(langId);
-
             return View(new WordData());
         }
 

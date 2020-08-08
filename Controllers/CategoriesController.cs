@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lexiconn.Controllers
@@ -35,17 +35,13 @@ namespace Lexiconn.Controllers
             return View(category);
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category)
         {
             bool duplicate = await _context.Categories.AnyAsync(c => c.Name.Equals(category.Name) && (c.UserName.Equals(_user.Identity.Name)));
-
             if (duplicate)
             {
                 ModelState.AddModelError("Name", ERR_CAT_EXISTS);
@@ -54,7 +50,7 @@ namespace Lexiconn.Controllers
             if (ModelState.IsValid)
             {
                 CreateCategory(category);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             return View(category);
         }

@@ -91,17 +91,13 @@ namespace Lexiconn.Controllers
             model.Translation = helper.TranslationsToString(translations);
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
         
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Language language)
         {
             bool duplicate = await _context.Languages.AnyAsync(l => l.Name.Equals(language.Name) && (l.UserName.Equals(_user.Identity.Name)));
-
             if (duplicate)
             {
                 ModelState.AddModelError("Name", ERR_LANG_EXISTS);

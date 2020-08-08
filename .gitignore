@@ -1,2 +1,6 @@
 
 Lexiconn/
+bin/
+obj/
+*.xlsx
+*.csproj*

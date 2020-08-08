@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Lexiconn.Models;
 using Lexiconn.ViewModels;
 using Lexiconn.Supplementary;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Lexiconn.Controllers
 {
@@ -130,11 +130,7 @@ namespace Lexiconn.Controllers
             return View("Error");
         }
 
-        [HttpGet]
-        public IActionResult SignIn()
-        {
-            return View(new SignInViewModel());
-        }
+        public IActionResult SignIn() => View(new SignInViewModel());
 
         [HttpPost]
         public async Task<IActionResult> SignIn(SignInViewModel model)
@@ -194,10 +190,7 @@ namespace Lexiconn.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
+        public IActionResult ChangePassword() => View();
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)

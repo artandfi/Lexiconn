@@ -4,9 +4,6 @@ namespace Lexiconn.Controllers
 {
     public class StatsController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
     }
 }
